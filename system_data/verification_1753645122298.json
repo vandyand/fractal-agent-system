@@ -1,0 +1,67 @@
+{
+  "workflowType": "functionality_test",
+  "workflowName": "New Functionality Test",
+  "steps": [
+    {
+      "step": 1,
+      "component": "task_manager",
+      "action": "create_test_task",
+      "success": false,
+      "error": "Unknown task manager action: create_test_task",
+      "timestamp": "2025-07-27T19:38:42.287Z"
+    },
+    {
+      "step": 2,
+      "component": "enhanced_comm",
+      "action": "run_test_workflow",
+      "success": true,
+      "result": {
+        "workflowId": "workflow_1753645122287",
+        "status": "completed"
+      },
+      "timestamp": "2025-07-27T19:38:42.297Z"
+    },
+    {
+      "step": 3,
+      "component": "agents",
+      "action": "execute_test_agents",
+      "success": false,
+      "error": "Request failed with status code 404",
+      "timestamp": "2025-07-27T19:38:42.298Z"
+    },
+    {
+      "step": 4,
+      "component": "system",
+      "action": "verify_results",
+      "success": true,
+      "result": {
+        "systemStatus": "running",
+        "components": {
+          "taskManager": {
+            "status": "ready",
+            "lastActivity": "2025-07-27T19:38:42.256Z"
+          },
+          "enhancedComm": {
+            "status": "ready",
+            "lastActivity": "2025-07-27T19:38:42.260Z"
+          },
+          "nodeRed": {
+            "status": "running",
+            "port": 1880,
+            "url": "http://localhost:1880"
+          },
+          "agents": {
+            "count": 5,
+            "active": 5
+          }
+        },
+        "startTime": "2025-07-27T19:38:42.273Z"
+      },
+      "timestamp": "2025-07-27T19:38:42.298Z"
+    }
+  ],
+  "success": false,
+  "startTime": "2025-07-27T19:38:42.287Z",
+  "endTime": "2025-07-27T19:38:42.298Z",
+  "duration": 11
+}

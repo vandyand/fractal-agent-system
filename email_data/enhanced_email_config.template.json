@@ -1,0 +1,8 @@
+{
+  "authMethod": "gmail_api",
+  "email": "your-email@gmail.com",
+  "testEmail": "test-email@gmail.com",
+  "companyName": "Your Company Name",
+  "createdAt": "2025-01-01T00:00:00.000Z",
+  "updatedAt": "2025-01-01T00:00:00.000Z"
+}

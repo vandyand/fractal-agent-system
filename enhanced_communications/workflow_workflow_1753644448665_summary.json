@@ -1,0 +1,91 @@
+{
+  "workflowId": "workflow_1753644448665",
+  "workflowName": "Customer Support Workflow",
+  "status": "completed",
+  "startTime": "2025-07-27T19:27:28.665Z",
+  "endTime": "2025-07-27T19:27:32.691Z",
+  "duration": 4026,
+  "totalSteps": 4,
+  "successfulSteps": 0,
+  "successRate": 0,
+  "agents": [
+    "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+    "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113"
+  ],
+  "results": {
+    "1": {
+      "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+      "action": "analyze_email",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+        "action": "analyze_email",
+        "result": {
+          "success": true,
+          "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+          "nodesTriggered": 1,
+          "timestamp": "2025-07-27T19:27:29.671Z"
+        },
+        "executionTime": 1753644449671,
+        "timestamp": "2025-07-27T19:27:29.671Z"
+      },
+      "timestamp": "2025-07-27T19:27:29.671Z"
+    },
+    "2": {
+      "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+      "action": "find_solution",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+        "action": "find_solution",
+        "result": {
+          "success": true,
+          "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+          "nodesTriggered": 1,
+          "timestamp": "2025-07-27T19:27:30.677Z"
+        },
+        "executionTime": 1753644450677,
+        "timestamp": "2025-07-27T19:27:30.677Z"
+      },
+      "timestamp": "2025-07-27T19:27:30.677Z"
+    },
+    "3": {
+      "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+      "action": "generate_response",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+        "action": "generate_response",
+        "result": {
+          "success": true,
+          "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+          "nodesTriggered": 1,
+          "timestamp": "2025-07-27T19:27:31.683Z"
+        },
+        "executionTime": 1753644451683,
+        "timestamp": "2025-07-27T19:27:31.683Z"
+      },
+      "timestamp": "2025-07-27T19:27:31.683Z"
+    },
+    "4": {
+      "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+      "action": "schedule_followup",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+        "action": "schedule_followup",
+        "result": {
+          "success": true,
+          "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+          "nodesTriggered": 1,
+          "timestamp": "2025-07-27T19:27:32.691Z"
+        },
+        "executionTime": 1753644452691,
+        "timestamp": "2025-07-27T19:27:32.691Z"
+      },
+      "timestamp": "2025-07-27T19:27:32.691Z"
+    }
+  }
+}

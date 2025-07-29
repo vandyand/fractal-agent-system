@@ -1,0 +1,61 @@
+{
+  "workflowType": "system_health",
+  "workflowName": "System Health Check",
+  "steps": [
+    {
+      "step": 1,
+      "component": "node_red",
+      "action": "check_connectivity",
+      "success": true,
+      "result": {
+        "status": 200,
+        "ok": true,
+        "url": "http://localhost:1880"
+      },
+      "timestamp": "2025-07-27T19:38:42.271Z"
+    },
+    {
+      "step": 2,
+      "component": "agents",
+      "action": "verify_agents",
+      "success": true,
+      "result": {
+        "totalAgents": 5,
+        "agentTypes": [
+          "schema_generator",
+          "workflow_generator",
+          "email_processor"
+        ],
+        "activeAgents": 0
+      },
+      "timestamp": "2025-07-27T19:38:42.272Z"
+    },
+    {
+      "step": 3,
+      "component": "task_manager",
+      "action": "test_task_creation",
+      "success": true,
+      "result": {
+        "taskId": "task_1753645122272_y7mjn2uj9",
+        "status": "pending"
+      },
+      "timestamp": "2025-07-27T19:38:42.272Z"
+    },
+    {
+      "step": 4,
+      "component": "enhanced_comm",
+      "action": "test_communication",
+      "success": true,
+      "result": {
+        "totalMessages": 0,
+        "agents": 5,
+        "workflows": 0
+      },
+      "timestamp": "2025-07-27T19:38:42.272Z"
+    }
+  ],
+  "success": true,
+  "startTime": "2025-07-27T19:38:42.270Z",
+  "endTime": "2025-07-27T19:38:42.272Z",
+  "duration": 2
+}

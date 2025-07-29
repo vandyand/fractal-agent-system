@@ -1,0 +1,65 @@
+{
+  "name": "fractal-agent-cli",
+  "version": "1.0.0",
+  "description": "Terminal-based fractal agent spawning and workflow automation system",
+  "main": "fractal_agent_cli.js",
+  "bin": {
+    "fractal-agent": "./fractal_agent_cli.js"
+  },
+  "scripts": {
+    "start": "node-red",
+    "spawn": "node fractal_agent_cli.js spawn",
+    "run": "node fractal_agent_cli.js run",
+    "list": "node fractal_agent_cli.js list",
+    "history": "node fractal_agent_cli.js history",
+    "demo": "node demo_runner.js",
+    "business": "node autonomous_business_runner.js",
+    "real": "node real_business_operations.js",
+    "protocol": "node agent_communication_protocol.js",
+    "test": "node test_runner.js",
+    "reality": "node reality_check.js",
+    "enhanced": "node enhanced_agent_communication.js",
+    "tasks": "node task_management_system.js",
+    "simple": "node simple_task_manager.js",
+    "system": "node fractal_system_entry.js",
+    "email": "node email_integration_system.js",
+    "simple:email": "node simple_email_system.js",
+    "enhanced:email": "node enhanced_email_system.js",
+    "test:email": "node local_email_test.js",
+    "gmail:setup": "node gmail_setup.js",
+    "nodered:start": "./start_node_red.sh start",
+    "nodered:stop": "./stop_node_red.sh",
+    "nodered:status": "./start_node_red.sh status",
+    "nodered:restart": "./start_node_red.sh restart",
+    "system:start": "./start_system.sh start",
+    "system:stop": "./start_system.sh stop",
+    "system:status": "./start_system.sh status",
+    "system:restart": "./start_system.sh restart",
+    "quick:start": "./quick_start.sh"
+  },
+  "keywords": [
+    "node-red",
+    "automation",
+    "agents",
+    "fractal",
+    "workflow",
+    "cli"
+  ],
+  "author": "Fractal Agent System",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.6.0",
+    "chalk": "^5.3.0",
+    "commander": "^11.1.0",
+    "googleapis": "^154.0.0",
+    "inquirer": "^9.2.12",
+    "nodemailer": "^7.0.5",
+    "node-red": "^3.1.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

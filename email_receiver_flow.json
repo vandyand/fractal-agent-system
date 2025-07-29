@@ -1,0 +1,63 @@
+[
+  {
+    "id": "e9a7e5a8.e1c1e8",
+    "type": "tab",
+    "label": "Email Receiver",
+    "disabled": false,
+    "info": ""
+  },
+  {
+    "id": "a1b2c3d4.e5f6g7",
+    "type": "inject",
+    "z": "e9a7e5a8.e1c1e8",
+    "name": "Check for New Emails",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 150,
+    "y": 100,
+    "wires": [["b1c2d3e4.f5g6h7"]]
+  },
+  {
+    "id": "b1c2d3e4.f5g6h7",
+    "type": "exec",
+    "z": "e9a7e5a8.e1c1e8",
+    "command": "node receive_and_save_emails.js",
+    "addpay": false,
+    "append": "",
+    "useSpawn": "false",
+    "timer": "",
+    "winHide": false,
+    "oldrc": false,
+    "name": "Run Email Receiver Script",
+    "x": 410,
+    "y": 100,
+    "wires": [["c1d2e3f4.g5h6i7"], [], []]
+  },
+  {
+    "id": "c1d2e3f4.g5h6i7",
+    "type": "debug",
+    "z": "e9a7e5a8.e1c1e8",
+    "name": "Script Output",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 650,
+    "y": 100,
+    "wires": []
+  }
+]

@@ -1,0 +1,758 @@
+{
+  "tasks": [
+    [
+      "task_1753645079736_yjizmbodu",
+      {
+        "id": "task_1753645079736_yjizmbodu",
+        "workflowType": "content_creation",
+        "name": "Content Creation Workflow",
+        "description": "Create content using available agents",
+        "status": "completed",
+        "priority": "high",
+        "inputData": {
+          "topic": "AI-Powered Task Management Systems",
+          "targetAudience": "software developers",
+          "contentType": "blog_post",
+          "wordCount": 1000
+        },
+        "metadata": {
+          "createdAt": "2025-07-27T19:37:59.736Z",
+          "createdBy": "demo_user",
+          "estimatedDuration": "5 minutes"
+        },
+        "workflow": {
+          "template": {
+            "name": "Content Creation Workflow",
+            "description": "Create content using available agents",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Content topic"
+                },
+                "targetAudience": {
+                  "type": "string",
+                  "description": "Target audience"
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "blog_post",
+                    "social_media",
+                    "email"
+                  ]
+                },
+                "wordCount": {
+                  "type": "number",
+                  "description": "Target word count"
+                }
+              },
+              "required": [
+                "topic",
+                "targetAudience",
+                "contentType"
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "action": "generate_schema",
+                "description": "Generate content schema"
+              },
+              {
+                "step": 2,
+                "action": "create_workflow",
+                "description": "Create content workflow"
+              },
+              {
+                "step": 3,
+                "action": "process_content",
+                "description": "Process content with agents"
+              }
+            ]
+          },
+          "currentStep": 3,
+          "totalSteps": 3,
+          "results": {
+            "1": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "action": "generate_schema",
+              "description": "Generate content schema",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+                "action": "generate_schema",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:37:59.741Z"
+              },
+              "timestamp": "2025-07-27T19:37:59.741Z"
+            },
+            "2": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "action": "create_workflow",
+              "description": "Create content workflow",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+                "action": "create_workflow",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:37:59.743Z"
+              },
+              "timestamp": "2025-07-27T19:37:59.743Z"
+            },
+            "3": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "action": "process_content",
+              "description": "Process content with agents",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+                "action": "process_content",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:37:59.745Z"
+              },
+              "timestamp": "2025-07-27T19:37:59.745Z"
+            }
+          }
+        },
+        "execution": {
+          "startTime": "2025-07-27T19:37:59.738Z",
+          "endTime": "2025-07-27T19:37:59.745Z",
+          "duration": 7,
+          "agentAssignments": [
+            {
+              "step": 1,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "agentType": "schema_generator",
+              "action": "generate_schema"
+            },
+            {
+              "step": 2,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "agentType": "workflow_generator",
+              "action": "create_workflow"
+            },
+            {
+              "step": 3,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "agentType": "email_processor",
+              "action": "process_content"
+            }
+          ],
+          "errors": []
+        }
+      }
+    ],
+    [
+      "task_1753645079746_lbr15m3zs",
+      {
+        "id": "task_1753645079746_lbr15m3zs",
+        "workflowType": "customer_support",
+        "name": "Customer Support Workflow",
+        "description": "Handle customer support requests",
+        "status": "completed",
+        "priority": "critical",
+        "inputData": {
+          "customerEmail": "customer@example.com",
+          "inquiry": "I need help with my subscription renewal",
+          "priority": "high"
+        },
+        "metadata": {
+          "createdAt": "2025-07-27T19:37:59.746Z",
+          "createdBy": "demo_user",
+          "estimatedDuration": "3 minutes"
+        },
+        "workflow": {
+          "template": {
+            "name": "Customer Support Workflow",
+            "description": "Handle customer support requests",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customerEmail": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "inquiry": {
+                  "type": "string",
+                  "description": "Customer inquiry"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "urgent"
+                  ]
+                }
+              },
+              "required": [
+                "customerEmail",
+                "inquiry"
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "action": "analyze_email",
+                "description": "Analyze customer email"
+              },
+              {
+                "step": 2,
+                "action": "generate_response",
+                "description": "Generate response"
+              },
+              {
+                "step": 3,
+                "action": "create_followup",
+                "description": "Create follow-up workflow"
+              }
+            ]
+          },
+          "currentStep": 3,
+          "totalSteps": 3,
+          "results": {
+            "1": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "action": "analyze_email",
+              "description": "Analyze customer email",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+                "action": "analyze_email",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:37:59.748Z"
+              },
+              "timestamp": "2025-07-27T19:37:59.748Z"
+            },
+            "2": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "action": "generate_response",
+              "description": "Generate response",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+                "action": "generate_response",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:37:59.749Z"
+              },
+              "timestamp": "2025-07-27T19:37:59.749Z"
+            },
+            "3": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "action": "create_followup",
+              "description": "Create follow-up workflow",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+                "action": "create_followup",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:37:59.750Z"
+              },
+              "timestamp": "2025-07-27T19:37:59.750Z"
+            }
+          }
+        },
+        "execution": {
+          "startTime": "2025-07-27T19:37:59.746Z",
+          "endTime": "2025-07-27T19:37:59.750Z",
+          "duration": 4,
+          "agentAssignments": [
+            {
+              "step": 1,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "agentType": "email_processor",
+              "action": "analyze_email"
+            },
+            {
+              "step": 2,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "agentType": "schema_generator",
+              "action": "generate_response"
+            },
+            {
+              "step": 3,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "agentType": "workflow_generator",
+              "action": "create_followup"
+            }
+          ],
+          "errors": []
+        }
+      }
+    ],
+    [
+      "task_1753645122272_y7mjn2uj9",
+      {
+        "id": "task_1753645122272_y7mjn2uj9",
+        "workflowType": "content_creation",
+        "name": "Content Creation Workflow",
+        "description": "Create content using available agents",
+        "status": "pending",
+        "priority": "low",
+        "inputData": {
+          "topic": "System Verification Test",
+          "targetAudience": "system",
+          "contentType": "blog_post",
+          "wordCount": 100
+        },
+        "metadata": {
+          "createdAt": "2025-07-27T19:38:42.272Z",
+          "createdBy": "system_verification",
+          "estimatedDuration": "unknown"
+        },
+        "workflow": {
+          "template": {
+            "name": "Content Creation Workflow",
+            "description": "Create content using available agents",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Content topic"
+                },
+                "targetAudience": {
+                  "type": "string",
+                  "description": "Target audience"
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "blog_post",
+                    "social_media",
+                    "email"
+                  ]
+                },
+                "wordCount": {
+                  "type": "number",
+                  "description": "Target word count"
+                }
+              },
+              "required": [
+                "topic",
+                "targetAudience",
+                "contentType"
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "action": "generate_schema",
+                "description": "Generate content schema"
+              },
+              {
+                "step": 2,
+                "action": "create_workflow",
+                "description": "Create content workflow"
+              },
+              {
+                "step": 3,
+                "action": "process_content",
+                "description": "Process content with agents"
+              }
+            ]
+          },
+          "currentStep": 0,
+          "totalSteps": 3,
+          "results": {}
+        },
+        "execution": {
+          "startTime": null,
+          "endTime": null,
+          "duration": null,
+          "agentAssignments": [],
+          "errors": []
+        }
+      }
+    ],
+    [
+      "task_1753645122274_mhsbgfk99",
+      {
+        "id": "task_1753645122274_mhsbgfk99",
+        "workflowType": "content_creation",
+        "name": "Content Creation Workflow",
+        "description": "Create content using available agents",
+        "status": "pending",
+        "priority": "low",
+        "inputData": {
+          "topic": "System Verification Test",
+          "targetAudience": "system",
+          "contentType": "blog_post",
+          "wordCount": 100
+        },
+        "metadata": {
+          "createdAt": "2025-07-27T19:38:42.274Z",
+          "createdBy": "system_verification",
+          "estimatedDuration": "unknown"
+        },
+        "workflow": {
+          "template": {
+            "name": "Content Creation Workflow",
+            "description": "Create content using available agents",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Content topic"
+                },
+                "targetAudience": {
+                  "type": "string",
+                  "description": "Target audience"
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "blog_post",
+                    "social_media",
+                    "email"
+                  ]
+                },
+                "wordCount": {
+                  "type": "number",
+                  "description": "Target word count"
+                }
+              },
+              "required": [
+                "topic",
+                "targetAudience",
+                "contentType"
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "action": "generate_schema",
+                "description": "Generate content schema"
+              },
+              {
+                "step": 2,
+                "action": "create_workflow",
+                "description": "Create content workflow"
+              },
+              {
+                "step": 3,
+                "action": "process_content",
+                "description": "Process content with agents"
+              }
+            ]
+          },
+          "currentStep": 0,
+          "totalSteps": 3,
+          "results": {}
+        },
+        "execution": {
+          "startTime": null,
+          "endTime": null,
+          "duration": null,
+          "agentAssignments": [],
+          "errors": []
+        }
+      }
+    ],
+    [
+      "task_1753645122275_z2hojaz5x",
+      {
+        "id": "task_1753645122275_z2hojaz5x",
+        "workflowType": "content_creation",
+        "name": "Content Creation Workflow",
+        "description": "Create content using available agents",
+        "status": "completed",
+        "priority": "medium",
+        "inputData": {
+          "topic": "AI-Powered Task Management",
+          "targetAudience": "developers",
+          "contentType": "blog_post",
+          "wordCount": 800,
+          "tone": "technical"
+        },
+        "metadata": {
+          "createdAt": "2025-07-27T19:38:42.275Z",
+          "createdBy": "system",
+          "estimatedDuration": "unknown"
+        },
+        "workflow": {
+          "template": {
+            "name": "Content Creation Workflow",
+            "description": "Create content using available agents",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Content topic"
+                },
+                "targetAudience": {
+                  "type": "string",
+                  "description": "Target audience"
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "blog_post",
+                    "social_media",
+                    "email"
+                  ]
+                },
+                "wordCount": {
+                  "type": "number",
+                  "description": "Target word count"
+                }
+              },
+              "required": [
+                "topic",
+                "targetAudience",
+                "contentType"
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "action": "generate_schema",
+                "description": "Generate content schema"
+              },
+              {
+                "step": 2,
+                "action": "create_workflow",
+                "description": "Create content workflow"
+              },
+              {
+                "step": 3,
+                "action": "process_content",
+                "description": "Process content with agents"
+              }
+            ]
+          },
+          "currentStep": 3,
+          "totalSteps": 3,
+          "results": {
+            "1": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "action": "generate_schema",
+              "description": "Generate content schema",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+                "action": "generate_schema",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:38:42.278Z"
+              },
+              "timestamp": "2025-07-27T19:38:42.278Z"
+            },
+            "2": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "action": "create_workflow",
+              "description": "Create content workflow",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+                "action": "create_workflow",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:38:42.280Z"
+              },
+              "timestamp": "2025-07-27T19:38:42.280Z"
+            },
+            "3": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "action": "process_content",
+              "description": "Process content with agents",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+                "action": "process_content",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:38:42.281Z"
+              },
+              "timestamp": "2025-07-27T19:38:42.281Z"
+            }
+          }
+        },
+        "execution": {
+          "startTime": "2025-07-27T19:38:42.275Z",
+          "endTime": "2025-07-27T19:38:42.281Z",
+          "duration": 6,
+          "agentAssignments": [
+            {
+              "step": 1,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "agentType": "schema_generator",
+              "action": "generate_schema"
+            },
+            {
+              "step": 2,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "agentType": "workflow_generator",
+              "action": "create_workflow"
+            },
+            {
+              "step": 3,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "agentType": "email_processor",
+              "action": "process_content"
+            }
+          ],
+          "errors": []
+        }
+      }
+    ],
+    [
+      "task_1753645122282_l2ynzkd0v",
+      {
+        "id": "task_1753645122282_l2ynzkd0v",
+        "workflowType": "customer_support",
+        "name": "Customer Support Workflow",
+        "description": "Handle customer support requests",
+        "status": "completed",
+        "priority": "medium",
+        "inputData": {
+          "customerEmail": "user@example.com",
+          "inquiry": "Help with system configuration",
+          "priority": "high",
+          "category": "technical"
+        },
+        "metadata": {
+          "createdAt": "2025-07-27T19:38:42.282Z",
+          "createdBy": "system",
+          "estimatedDuration": "unknown"
+        },
+        "workflow": {
+          "template": {
+            "name": "Customer Support Workflow",
+            "description": "Handle customer support requests",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "customerEmail": {
+                  "type": "string",
+                  "format": "email"
+                },
+                "inquiry": {
+                  "type": "string",
+                  "description": "Customer inquiry"
+                },
+                "priority": {
+                  "type": "string",
+                  "enum": [
+                    "low",
+                    "medium",
+                    "high",
+                    "urgent"
+                  ]
+                }
+              },
+              "required": [
+                "customerEmail",
+                "inquiry"
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "action": "analyze_email",
+                "description": "Analyze customer email"
+              },
+              {
+                "step": 2,
+                "action": "generate_response",
+                "description": "Generate response"
+              },
+              {
+                "step": 3,
+                "action": "create_followup",
+                "description": "Create follow-up workflow"
+              }
+            ]
+          },
+          "currentStep": 3,
+          "totalSteps": 3,
+          "results": {
+            "1": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "action": "analyze_email",
+              "description": "Analyze customer email",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+                "action": "analyze_email",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:38:42.283Z"
+              },
+              "timestamp": "2025-07-27T19:38:42.283Z"
+            },
+            "2": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "action": "generate_response",
+              "description": "Generate response",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+                "action": "generate_response",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:38:42.285Z"
+              },
+              "timestamp": "2025-07-27T19:38:42.285Z"
+            },
+            "3": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "action": "create_followup",
+              "description": "Create follow-up workflow",
+              "result": {
+                "success": false,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+                "action": "create_followup",
+                "error": "Request failed with status code 404",
+                "timestamp": "2025-07-27T19:38:42.286Z"
+              },
+              "timestamp": "2025-07-27T19:38:42.286Z"
+            }
+          }
+        },
+        "execution": {
+          "startTime": "2025-07-27T19:38:42.282Z",
+          "endTime": "2025-07-27T19:38:42.286Z",
+          "duration": 4,
+          "agentAssignments": [
+            {
+              "step": 1,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753579222708",
+              "agentType": "email_processor",
+              "action": "analyze_email"
+            },
+            {
+              "step": 2,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+              "agentType": "schema_generator",
+              "action": "generate_response"
+            },
+            {
+              "step": 3,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.workflow_generator_1753579222685",
+              "agentType": "workflow_generator",
+              "action": "create_followup"
+            }
+          ],
+          "errors": []
+        }
+      }
+    ]
+  ],
+  "taskQueue": [
+    "task_1753645079736_yjizmbodu",
+    "task_1753645079746_lbr15m3zs",
+    "task_1753645122272_y7mjn2uj9",
+    "task_1753645122274_mhsbgfk99",
+    "task_1753645122275_z2hojaz5x",
+    "task_1753645122282_l2ynzkd0v"
+  ],
+  "completedTasks": [
+    "task_1753645079736_yjizmbodu",
+    "task_1753645079746_lbr15m3zs",
+    "task_1753645122275_z2hojaz5x",
+    "task_1753645122282_l2ynzkd0v"
+  ],
+  "failedTasks": [],
+  "timestamp": "2025-07-27T19:38:42.286Z"
+}

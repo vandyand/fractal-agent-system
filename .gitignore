@@ -1,0 +1,26 @@
+# Dependencies
+/node_modules
+
+# Log files
+*.log
+
+# PID files
+*.pid
+
+# Local editor files
+.cursorindexingignore
+.specstory/
+
+# Secrets
+email_data/client_secret_*.json
+email_data/token.json
+email_data/credentials.json
+email_data/enhanced_email_config.json
+email_data/simple_email_config.json
+
+final_business_state.json
+business_state_iteration_5.json
+fractal_system_state.json
+fractal_agent_spawner.json
+automated_workflow_runner.json
+dynamic_schema_generator.json

@@ -1,0 +1,102 @@
+[
+  {
+    "id": "msg_1753590647076_qxb1x7rln",
+    "from": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "to": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579222664",
+    "messageType": "request",
+    "payload": {
+      "task": "test_communication",
+      "data": {
+        "message": "Hello from agent 1!"
+      }
+    },
+    "timestamp": "2025-07-27T04:30:47.076Z",
+    "correlationId": "corr_1753590647076",
+    "status": "completed",
+    "sentAt": "2025-07-27T04:30:47.077Z",
+    "response": {
+      "originalRequestId": "msg_1753590647076_qxb1x7rln",
+      "task": "test_communication",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579222664",
+        "nodesTriggered": 1,
+        "timestamp": "2025-07-27T04:30:48.082Z"
+      },
+      "success": true
+    }
+  },
+  {
+    "id": "msg_1753590648082_5igmwv4fu",
+    "from": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579222664",
+    "to": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "messageType": "response",
+    "payload": {
+      "originalRequestId": "msg_1753590647076_qxb1x7rln",
+      "task": "test_communication",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579222664",
+        "nodesTriggered": 1,
+        "timestamp": "2025-07-27T04:30:48.082Z"
+      },
+      "success": true
+    },
+    "timestamp": "2025-07-27T04:30:48.082Z",
+    "correlationId": "corr_1753590647076",
+    "status": "sent",
+    "sentAt": "2025-07-27T04:30:48.083Z"
+  },
+  {
+    "id": "msg_1753590648083_xn0fv44lw",
+    "from": "task_manager",
+    "to": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "messageType": "task_assignment",
+    "payload": {
+      "taskId": "test_task_001",
+      "taskData": {
+        "operation": "test_operation",
+        "input": "test_input"
+      }
+    },
+    "timestamp": "2025-07-27T04:30:48.083Z",
+    "correlationId": "corr_1753590648083",
+    "status": "sent",
+    "sentAt": "2025-07-27T04:30:48.083Z"
+  },
+  {
+    "id": "msg_1753590649087_uku44yec4",
+    "from": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "to": "task_manager",
+    "messageType": "result_delivery",
+    "payload": {
+      "taskId": "test_task_001",
+      "result": {
+        "success": true,
+        "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+        "nodesTriggered": 1,
+        "timestamp": "2025-07-27T04:30:49.087Z"
+      },
+      "success": true,
+      "completedAt": "2025-07-27T04:30:49.087Z"
+    },
+    "timestamp": "2025-07-27T04:30:49.087Z",
+    "correlationId": "corr_1753590648083",
+    "status": "sent",
+    "sentAt": "2025-07-27T04:30:49.087Z"
+  },
+  {
+    "id": "msg_1753590649088_f19ugtkv9",
+    "from": "universe.galaxy.solar_system.planet.continent.country.city.building.schema_generator_1753579190113",
+    "to": "all",
+    "messageType": "broadcast",
+    "payload": {
+      "topic": "system_announcement",
+      "message": "Communication protocol is working!",
+      "targetCluster": null
+    },
+    "timestamp": "2025-07-27T04:30:49.088Z",
+    "correlationId": "corr_1753590649088",
+    "status": "pending"
+  }
+]

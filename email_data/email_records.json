@@ -1,0 +1,164 @@
+[
+  {
+    "type": "sent",
+    "to": "vandyand@gmail.com",
+    "subject": "Customer Support Response - TICKET-12345",
+    "messageId": "<09334f27-90f6-9887-33ff-48f640c82990@gmail.com>",
+    "timestamp": "2025-07-27T20:13:34.618Z"
+  },
+  {
+    "type": "sent",
+    "to": "vandyand@gmail.com",
+    "subject": "Order Confirmation - ORD-67890",
+    "messageId": "<f510a30b-65e8-f0c7-0905-96cb2af847f9@gmail.com>",
+    "timestamp": "2025-07-27T20:13:36.349Z"
+  },
+  {
+    "type": "sent",
+    "to": "vandyand@gmail.com",
+    "subject": "Customer Support Response - TICKET-12345",
+    "messageId": "<da7b0b31-9e73-da80-3a18-5af74156c146@gmail.com>",
+    "timestamp": "2025-07-27T22:09:26.454Z"
+  },
+  {
+    "type": "received",
+    "from": "Google <no-reply@accounts.google.com>",
+    "subject": "Security alert",
+    "category": "general",
+    "priority": "medium",
+    "messageId": "1984d8338bd23214",
+    "timestamp": "2025-07-27T22:09:27.821Z"
+  },
+  {
+    "type": "received",
+    "from": "Google <no-reply@accounts.google.com>",
+    "subject": "Recovery email verified for your Google Account",
+    "category": "general",
+    "priority": "medium",
+    "messageId": "1984d82688dc0e95",
+    "timestamp": "2025-07-27T22:09:27.822Z"
+  },
+  {
+    "type": "received",
+    "from": "Google <no-reply@accounts.google.com>",
+    "subject": "Security alert",
+    "category": "general",
+    "priority": "medium",
+    "messageId": "1984d7e9a3d87aea",
+    "timestamp": "2025-07-27T22:09:27.822Z"
+  },
+  {
+    "type": "received",
+    "from": "Google <no-reply@accounts.google.com>",
+    "subject": "2-Step Verification turned on",
+    "category": "general",
+    "priority": "medium",
+    "messageId": "1984d7c98f87707c",
+    "timestamp": "2025-07-27T22:09:27.823Z"
+  },
+  {
+    "type": "received",
+    "from": "Google <no-reply@accounts.google.com>",
+    "subject": "Security alert",
+    "category": "general",
+    "priority": "medium",
+    "messageId": "1984d7c9306da3e3",
+    "timestamp": "2025-07-27T22:09:27.823Z"
+  },
+  {
+    "type": "sent",
+    "to": "vandyand@gmail.com",
+    "subject": "Customer Support Response - TICKET-12345",
+    "messageId": "<add74d34-15ab-c33f-aa2c-c3012949c02f@gmail.com>",
+    "timestamp": "2025-07-28T01:31:31.589Z"
+  },
+  {
+    "type": "received",
+    "from": "frontdesk@oanda.com",
+    "subject": "Trading activity on your OANDA Account: 001-001-1352681-001 on 06-04-2025",
+    "category": "sales",
+    "priority": "medium",
+    "messageId": "197415b994a54b8b",
+    "timestamp": "2025-07-28T01:31:32.812Z"
+  },
+  {
+    "type": "sent",
+    "to": "Robinhood <noreply@robinhood.com>",
+    "subject": "Re: Last day of $1M pie",
+    "messageId": "<23878cc2-7b31-87e8-a4bc-796ea6cf24ea@gmail.com>",
+    "timestamp": "2025-07-28T01:31:34.239Z"
+  },
+  {
+    "type": "received",
+    "from": "Robinhood <noreply@robinhood.com>",
+    "subject": "Last day of $1M pie",
+    "category": "support",
+    "priority": "medium",
+    "messageId": "19740bb097dffb21",
+    "timestamp": "2025-07-28T01:31:34.240Z"
+  },
+  {
+    "type": "sent",
+    "to": "OANDA <noreply@engage.oanda.com>",
+    "subject": "Re: June 2025 - Live Market Analysis Webinar with OANDA!",
+    "messageId": "<a28f5068-3d87-675e-f17f-cba19c8b8e2d@gmail.com>",
+    "timestamp": "2025-07-28T01:31:35.782Z"
+  },
+  {
+    "type": "received",
+    "from": "OANDA <noreply@engage.oanda.com>",
+    "subject": "June 2025 - Live Market Analysis Webinar with OANDA!",
+    "category": "support",
+    "priority": "medium",
+    "messageId": "197409bd2b3516e7",
+    "timestamp": "2025-07-28T01:31:35.784Z"
+  },
+  {
+    "type": "received",
+    "from": "Team Mudrex <updates@marketing.mudrex.com>",
+    "subject": "Welcome to the upgraded Alpha experience 🚀",
+    "category": "sales",
+    "priority": "medium",
+    "messageId": "197408bc9d7c8bcc",
+    "timestamp": "2025-07-28T01:31:35.785Z"
+  },
+  {
+    "type": "sent",
+    "to": "Bethany on Facebook <friends@facebookmail.com>",
+    "subject": "Re: You're now friends with Bethany Dos Santos! See her photos, posts and more.",
+    "messageId": "<a2dd2c33-0e18-abb7-503d-bf6d6f57ef17@gmail.com>",
+    "timestamp": "2025-07-28T01:31:37.192Z"
+  },
+  {
+    "type": "received",
+    "from": "Bethany on Facebook <friends@facebookmail.com>",
+    "subject": "You're now friends with Bethany Dos Santos! See her photos, posts and more.",
+    "category": "support",
+    "priority": "low",
+    "messageId": "1973e1d0185cfa69",
+    "timestamp": "2025-07-28T01:31:37.193Z"
+  },
+  {
+    "type": "sent",
+    "to": "vandyand@gmail.com",
+    "subject": "Customer Support Response - TICKET-12345",
+    "messageId": "<38b6485e-9f97-10e2-cd18-98d81a53481f@gmail.com>",
+    "timestamp": "2025-07-28T01:42:11.579Z"
+  },
+  {
+    "type": "sent",
+    "to": "Google Community Team <googlecommunityteam-noreply@google.com>",
+    "subject": "Re: Your Google Account is live – don't miss out on potential customers",
+    "messageId": "<46d8d660-69fc-8102-9501-e4668f5368ab@gmail.com>",
+    "timestamp": "2025-07-28T01:42:13.166Z"
+  },
+  {
+    "type": "received",
+    "from": "Google Community Team <googlecommunityteam-noreply@google.com>",
+    "subject": "Your Google Account is live – don't miss out on potential customers",
+    "category": "support",
+    "priority": "low",
+    "messageId": "1984eab7a90d095b",
+    "timestamp": "2025-07-28T01:42:13.167Z"
+  }
+]

@@ -1,0 +1,24 @@
+{
+  "systemStatus": "stopped",
+  "startTime": "2025-07-27T19:38:42.273Z",
+  "components": {
+    "taskManager": {
+      "status": "ready",
+      "lastActivity": "2025-07-27T19:38:42.256Z"
+    },
+    "enhancedComm": {
+      "status": "ready",
+      "lastActivity": "2025-07-27T19:38:42.260Z"
+    },
+    "nodeRed": {
+      "status": "running",
+      "port": 1880,
+      "url": "http://localhost:1880"
+    },
+    "agents": {
+      "count": 5,
+      "active": 5
+    }
+  },
+  "timestamp": "2025-07-27T19:38:42.299Z"
+}
