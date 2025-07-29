@@ -12,6 +12,7 @@
 .specstory/
 
 # Secrets
+.env
 email_data/client_secret_*.json
 email_data/token.json
 email_data/credentials.json
