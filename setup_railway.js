@@ -26,86 +26,148 @@ if (!fs.existsSync(dataDir)) {
   console.log(`✅ Created data directory: ${dataDir}`);
 }
 
-// Create a simple flows configuration file
-const flowsConfig = {
-  flows: [
-    {
-      id: "email_triggered_tab",
-      type: "tab",
-      label: "Email Processing System",
-      disabled: false,
-      info: "AI-powered email processing with Node-RED",
-    },
-    {
-      id: "email_in_node",
-      type: "email in",
-      z: "email_triggered_tab",
-      name: "Gmail Receiver",
-      server: "imap.gmail.com",
-      port: "993",
-      tls: true,
-      tlsOptions: {},
-      autotls: "never",
-      username: process.env.GMAIL_USER || "pragmagen@gmail.com",
-      password: process.env.GMAIL_APP_PASSWORD || "",
-      passwordType: "str",
-      keepalive: "keepalive",
-      poll: 30,
-      pollInterval: 30,
-      pollIntervalUnits: "seconds",
-      filter: 'is:unread -label:"Processed by Node-RED"',
-      markSeen: false,
-      markRead: false,
-      delete: false,
-      deleteAfter: 0,
-      x: 150,
-      y: 100,
-      wires: [["email_logger"]],
-    },
-    {
-      id: "email_logger",
-      type: "file",
-      z: "email_triggered_tab",
-      name: "Log All Emails",
-      filename: "/data/email_logs.txt",
-      appendNewline: true,
-      createDir: false,
-      overwriteFile: "false",
-      encoding: "none",
-      x: 350,
-      y: 100,
-      wires: [],
-    },
-    {
-      id: "health_check",
-      type: "http in",
-      z: "system_status_tab",
-      name: "Health Check",
-      url: "/health",
-      method: "get",
-      upload: false,
-      swaggerDoc: "",
-      x: 150,
-      y: 100,
-      wires: [["health_response"]],
-    },
-    {
-      id: "health_response",
-      type: "http response",
-      z: "system_status_tab",
-      name: "Health Response",
-      statusCode: "200",
-      headers: {},
-      x: 350,
-      y: 100,
-      wires: [],
-    },
-    {
-      id: "status_generator",
-      type: "function",
-      z: "system_status_tab",
-      name: "Generate Status",
-      func: `msg.payload = {
+// Create a working flows configuration file
+const flowsConfig = [
+  {
+    id: "email_processing_tab",
+    type: "tab",
+    label: "Email Processing System",
+    disabled: false,
+    info: "AI-powered email processing with Node-RED",
+  },
+  {
+    id: "email_in_node",
+    type: "email in",
+    z: "email_processing_tab",
+    name: "Gmail Receiver",
+    server: "imap.gmail.com",
+    port: "993",
+    tls: true,
+    tlsOptions: {},
+    autotls: "never",
+    username: process.env.GMAIL_USER || "pragmagen@gmail.com",
+    password: process.env.GMAIL_APP_PASSWORD || "",
+    passwordType: "str",
+    keepalive: "keepalive",
+    poll: 30,
+    pollInterval: 30,
+    pollIntervalUnits: "seconds",
+    filter: 'is:unread -label:"Processed by Node-RED"',
+    markSeen: false,
+    markRead: false,
+    delete: false,
+    deleteAfter: 0,
+    x: 150,
+    y: 100,
+    wires: [["email_processor"]],
+  },
+  {
+    id: "email_processor",
+    type: "function",
+    z: "email_processing_tab",
+    name: "Process Email",
+    func: `// Process incoming email and generate AI response
+const email = msg.payload;
+
+// Log the email
+console.log('📧 Email received:', email.subject, 'from:', email.from);
+
+// Create a simple response for now
+const response = {
+    to: email.from,
+    subject: \`Re: \${email.subject}\`,
+    text: \`Hi there!\\n\\nThanks for your email about "\${email.subject}". This is an automated response from our AI-powered email system.\\n\\nWe'll get back to you soon!\\n\\nBest regards,\\nPragmaGen Systems\`,
+    html: \`<p>Hi there!</p><p>Thanks for your email about "\${email.subject}". This is an automated response from our AI-powered email system.</p><p>We'll get back to you soon!</p><p>Best regards,<br>PragmaGen Systems</p>\`
+};
+
+msg.payload = response;
+msg.emailData = email;
+
+return msg;`,
+    outputs: 1,
+    noerr: 0,
+    initialize: "",
+    finalize: "",
+    libs: [],
+    x: 350,
+    y: 100,
+    wires: [["email_sender"]],
+  },
+  {
+    id: "email_sender",
+    type: "email out",
+    z: "email_processing_tab",
+    name: "Send Response",
+    server: "smtp.gmail.com",
+    port: "587",
+    secure: false,
+    tls: true,
+    autotls: true,
+    username: process.env.GMAIL_USER || "pragmagen@gmail.com",
+    password: process.env.GMAIL_APP_PASSWORD || "",
+    passwordType: "str",
+    from: process.env.GMAIL_USER || "pragmagen@gmail.com",
+    to: "",
+    cc: "",
+    bcc: "",
+    subject: "",
+    text: "",
+    html: "",
+    x: 550,
+    y: 100,
+    wires: [["email_logger"]],
+  },
+  {
+    id: "email_logger",
+    type: "file",
+    z: "email_processing_tab",
+    name: "Log Email Response",
+    filename: "/data/email_responses.log",
+    appendNewline: true,
+    createDir: false,
+    overwriteFile: "false",
+    encoding: "none",
+    x: 750,
+    y: 100,
+    wires: [],
+  },
+  {
+    id: "health_check_tab",
+    type: "tab",
+    label: "System Health",
+    disabled: false,
+    info: "System monitoring and health checks",
+  },
+  {
+    id: "health_check",
+    type: "http in",
+    z: "health_check_tab",
+    name: "Health Check",
+    url: "/health",
+    method: "get",
+    upload: false,
+    swaggerDoc: "",
+    x: 150,
+    y: 100,
+    wires: [["health_response"]],
+  },
+  {
+    id: "health_response",
+    type: "http response",
+    z: "health_check_tab",
+    name: "Health Response",
+    statusCode: "200",
+    headers: {},
+    x: 350,
+    y: 100,
+    wires: [],
+  },
+  {
+    id: "status_generator",
+    type: "function",
+    z: "health_check_tab",
+    name: "Generate Status",
+    func: `msg.payload = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     service: 'fractal-agent-system',
@@ -115,17 +177,16 @@ const flowsConfig = {
     railway: true
 };
 return msg;`,
-      outputs: 1,
-      noerr: 0,
-      initialize: "",
-      finalize: "",
-      libs: [],
-      x: 250,
-      y: 100,
-      wires: [["health_response"]],
-    },
-  ],
-};
+    outputs: 1,
+    noerr: 0,
+    initialize: "",
+    finalize: "",
+    libs: [],
+    x: 250,
+    y: 100,
+    wires: [["health_response"]],
+  },
+];
 
 // Write the flows configuration
 const flowsPath = path.join(dataDir, "flows.json");
@@ -166,3 +227,7 @@ console.log(
 );
 console.log("🔧 Node-RED editor at: https://your-app-name.railway.app/red");
 console.log("🏥 Health check at: https://your-app-name.railway.app/health");
+console.log(
+  "📧 Gmail credentials configured:",
+  !!process.env.GMAIL_USER && !!process.env.GMAIL_APP_PASSWORD
+);
