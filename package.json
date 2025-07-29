@@ -7,7 +7,7 @@
     "fractal-agent": "./fractal_agent_cli.js"
   },
   "scripts": {
-    "start": "node-red",
+    "start": "node setup_railway.js && node-red",
     "spawn": "node fractal_agent_cli.js spawn",
     "run": "node fractal_agent_cli.js run",
     "list": "node fractal_agent_cli.js list",
