@@ -7,7 +7,7 @@
     "fractal-agent": "./fractal_agent_cli.js"
   },
   "scripts": {
-    "start": "node setup_railway.js && node-red",
+    "start": "node setup_railway.js && node email_processor_server.js & node-red",
     "spawn": "node fractal_agent_cli.js spawn",
     "run": "node fractal_agent_cli.js run",
     "list": "node fractal_agent_cli.js list",
@@ -51,6 +51,7 @@
     "axios": "^1.6.0",
     "chalk": "^5.3.0",
     "commander": "^11.1.0",
+    "express": "^4.18.2",
     "googleapis": "^154.0.0",
     "inquirer": "^9.2.12",
     "nodemailer": "^7.0.5",

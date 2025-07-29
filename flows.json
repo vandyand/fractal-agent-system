@@ -25,19 +25,22 @@
     "payloadType": "str",
     "x": 150,
     "y": 100,
-    "wires": [["email_processor"]]
+    "wires": [["email_http_trigger"]]
   },
   {
-    "id": "email_processor",
-    "type": "function",
+    "id": "email_http_trigger",
+    "type": "http request",
     "z": "email_processing_tab",
-    "name": "Process Emails",
-    "func": "// Process emails using our existing email system\nconst { LocalEmailTest } = require('./local_email_test.js');\n\n// Initialize email system\nconst emailSystem = new LocalEmailTest();\n\n// Process emails\nemailSystem.init().then(() => {\n    return emailSystem.checkForNewEmails();\n}).then((result) => {\n    console.log('Email processing result:', result);\n    msg.payload = result;\n    node.send(msg);\n}).catch((error) => {\n    console.error('Email processing error:', error);\n    msg.payload = { error: error.message };\n    node.send(msg);\n});\n\nreturn null;",
-    "outputs": 1,
-    "noerr": 0,
-    "initialize": "",
-    "finalize": "",
-    "libs": [],
+    "name": "Trigger Email Processing",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "http://localhost:3000/process-emails",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "",
+    "senderr": false,
     "x": 350,
     "y": 100,
     "wires": [["email_logger"]]
@@ -67,7 +70,7 @@
     "swaggerDoc": "",
     "x": 150,
     "y": 200,
-    "wires": [["email_processor"]]
+    "wires": [["email_http_trigger"]]
   },
   {
     "id": "health_check_tab",
