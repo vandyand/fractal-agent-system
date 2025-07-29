@@ -26,7 +26,7 @@ if (!fs.existsSync(dataDir)) {
   console.log(`✅ Created data directory: ${dataDir}`);
 }
 
-// Create a working flows configuration file
+// Create a working flows configuration file that doesn't rely on external email nodes
 const flowsConfig = [
   {
     id: "email_processing_tab",
@@ -36,27 +36,22 @@ const flowsConfig = [
     info: "AI-powered email processing with Node-RED",
   },
   {
-    id: "email_in_node",
-    type: "email in",
+    id: "email_poll_trigger",
+    type: "inject",
     z: "email_processing_tab",
-    name: "Gmail Receiver",
-    server: "imap.gmail.com",
-    port: "993",
-    tls: true,
-    tlsOptions: {},
-    autotls: "never",
-    username: process.env.GMAIL_USER || "pragmagen@gmail.com",
-    password: process.env.GMAIL_APP_PASSWORD || "",
-    passwordType: "str",
-    keepalive: "keepalive",
-    poll: 30,
-    pollInterval: 30,
-    pollIntervalUnits: "seconds",
-    filter: 'is:unread -label:"Processed by Node-RED"',
-    markSeen: false,
-    markRead: false,
-    delete: false,
-    deleteAfter: 0,
+    name: "Poll Emails Every 30s",
+    props: [
+      {
+        p: "payload",
+      },
+    ],
+    repeat: "30",
+    crontab: "",
+    once: false,
+    onceDelay: 0.1,
+    topic: "",
+    payload: "poll",
+    payloadType: "str",
     x: 150,
     y: 100,
     wires: [["email_processor"]],
@@ -65,25 +60,27 @@ const flowsConfig = [
     id: "email_processor",
     type: "function",
     z: "email_processing_tab",
-    name: "Process Email",
-    func: `// Process incoming email and generate AI response
-const email = msg.payload;
+    name: "Process Emails",
+    func: `// Process emails using our existing email system
+const { LocalEmailTest } = require('./local_email_test.js');
 
-// Log the email
-console.log('📧 Email received:', email.subject, 'from:', email.from);
+// Initialize email system
+const emailSystem = new LocalEmailTest();
 
-// Create a simple response for now
-const response = {
-    to: email.from,
-    subject: \`Re: \${email.subject}\`,
-    text: \`Hi there!\\n\\nThanks for your email about "\${email.subject}". This is an automated response from our AI-powered email system.\\n\\nWe'll get back to you soon!\\n\\nBest regards,\\nPragmaGen Systems\`,
-    html: \`<p>Hi there!</p><p>Thanks for your email about "\${email.subject}". This is an automated response from our AI-powered email system.</p><p>We'll get back to you soon!</p><p>Best regards,<br>PragmaGen Systems</p>\`
-};
+// Process emails
+emailSystem.init().then(() => {
+    return emailSystem.checkForNewEmails();
+}).then((result) => {
+    console.log('Email processing result:', result);
+    msg.payload = result;
+    node.send(msg);
+}).catch((error) => {
+    console.error('Email processing error:', error);
+    msg.payload = { error: error.message };
+    node.send(msg);
+});
 
-msg.payload = response;
-msg.emailData = email;
-
-return msg;`,
+return null;`,
     outputs: 1,
     noerr: 0,
     initialize: "",
@@ -91,45 +88,34 @@ return msg;`,
     libs: [],
     x: 350,
     y: 100,
-    wires: [["email_sender"]],
-  },
-  {
-    id: "email_sender",
-    type: "email out",
-    z: "email_processing_tab",
-    name: "Send Response",
-    server: "smtp.gmail.com",
-    port: "587",
-    secure: false,
-    tls: true,
-    autotls: true,
-    username: process.env.GMAIL_USER || "pragmagen@gmail.com",
-    password: process.env.GMAIL_APP_PASSWORD || "",
-    passwordType: "str",
-    from: process.env.GMAIL_USER || "pragmagen@gmail.com",
-    to: "",
-    cc: "",
-    bcc: "",
-    subject: "",
-    text: "",
-    html: "",
-    x: 550,
-    y: 100,
     wires: [["email_logger"]],
   },
   {
     id: "email_logger",
     type: "file",
     z: "email_processing_tab",
-    name: "Log Email Response",
-    filename: "/data/email_responses.log",
+    name: "Log Email Activity",
+    filename: "/data/email_activity.log",
     appendNewline: true,
     createDir: false,
     overwriteFile: "false",
     encoding: "none",
-    x: 750,
+    x: 550,
     y: 100,
     wires: [],
+  },
+  {
+    id: "manual_email_trigger",
+    type: "http in",
+    z: "email_processing_tab",
+    name: "Manual Email Check",
+    url: "/check-emails",
+    method: "post",
+    upload: false,
+    swaggerDoc: "",
+    x: 150,
+    y: 200,
+    wires: [["email_processor"]],
   },
   {
     id: "health_check_tab",
@@ -149,18 +135,7 @@ return msg;`,
     swaggerDoc: "",
     x: 150,
     y: 100,
-    wires: [["health_response"]],
-  },
-  {
-    id: "health_response",
-    type: "http response",
-    z: "health_check_tab",
-    name: "Health Response",
-    statusCode: "200",
-    headers: {},
-    x: 350,
-    y: 100,
-    wires: [],
+    wires: [["status_generator"]],
   },
   {
     id: "status_generator",
@@ -174,7 +149,8 @@ return msg;`,
     version: '1.0.0',
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'production',
-    railway: true
+    railway: true,
+    email_system: 'active'
 };
 return msg;`,
     outputs: 1,
@@ -182,9 +158,20 @@ return msg;`,
     initialize: "",
     finalize: "",
     libs: [],
-    x: 250,
+    x: 350,
     y: 100,
     wires: [["health_response"]],
+  },
+  {
+    id: "health_response",
+    type: "http response",
+    z: "health_check_tab",
+    name: "Health Response",
+    statusCode: "200",
+    headers: {},
+    x: 550,
+    y: 100,
+    wires: [],
   },
 ];
 
@@ -227,6 +214,9 @@ console.log(
 );
 console.log("🔧 Node-RED editor at: https://your-app-name.railway.app/red");
 console.log("🏥 Health check at: https://your-app-name.railway.app/health");
+console.log(
+  "📧 Manual email check at: https://your-app-name.railway.app/check-emails"
+);
 console.log(
   "📧 Gmail credentials configured:",
   !!process.env.GMAIL_USER && !!process.env.GMAIL_APP_PASSWORD
