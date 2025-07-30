@@ -255,12 +255,15 @@ ${result.signature}
 ---
 Ticket ID: ${ticketId} | Priority: ${categorization.priority} | Urgency: ${result.urgency_level}`;
 
-      return {
+      const emailResponse = {
         to: email.from,
         subject: result.subject,
         text: emailBody,
         html: emailBody.replace(/\n/g, "<br>"),
       };
+      
+      console.log("📧 Generated email response:", JSON.stringify(emailResponse, null, 2));
+      return emailResponse;
     } catch (error) {
       console.error("❌ AI response generation failed:", error.message);
       // Fallback to basic template
@@ -445,19 +448,45 @@ ${signature}`;
 
   async sendEmail(emailData) {
     try {
-      const mailOptions = {
-        from: "pragmagen@gmail.com",
-        to: emailData.to,
-        subject: emailData.subject,
-        text: emailData.text,
-        html: emailData.html,
-      };
+      console.log("📤 Attempting to send email via Gmail API...");
+      console.log("📧 Email data:", JSON.stringify(emailData, null, 2));
+      
+      // Create email content for Gmail API
+      const emailContent = `From: pragmagen@gmail.com
+To: ${emailData.to}
+Subject: ${emailData.subject}
+Content-Type: text/html; charset=utf-8
 
-      const result = await this.transporter.sendMail(mailOptions);
-      console.log(`✅ Email sent: ${result.messageId}`);
-      return result;
+${emailData.html}`;
+
+      // Encode the email in base64
+      const encodedEmail = Buffer.from(emailContent).toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      console.log("📤 Sending via Gmail API...");
+
+      // Send email via Gmail API
+      const result = await this.gmail.users.messages.send({
+        userId: "me",
+        requestBody: {
+          raw: encodedEmail
+        }
+      });
+
+      console.log(`✅ Email sent successfully via Gmail API: ${result.data.id}`);
+      return result.data;
     } catch (error) {
-      console.error("❌ Failed to send email:", error.message);
+      console.error("❌ Failed to send email via Gmail API:");
+      console.error("   Error message:", error.message);
+      console.error("   Error code:", error.code);
+      console.error("   Error stack:", error.stack);
+      
+      if (error.response) {
+        console.error("   Response data:", error.response.data);
+        console.error("   Response status:", error.response.status);
+      }
       throw error;
     }
   }
@@ -469,10 +498,11 @@ ${signature}`;
         id: messageId,
         requestBody: {
           addLabelIds: [this.processedLabelId],
+          removeLabelIds: ["UNREAD"], // Mark as read
         },
       });
 
-      console.log(`✅ Marked email ${messageId} as processed`);
+      console.log(`✅ Marked email ${messageId} as processed and read`);
     } catch (error) {
       console.error(`❌ Failed to mark email as processed:`, error.message);
     }

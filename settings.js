@@ -56,12 +56,16 @@ module.exports = {
 
   // Node-RED scans the `nodes` directory in the userDir to find local node files.
   // The following property can be used to specify an additional directory to scan.
-  //nodesDir: '/home/nol/.node-red/nodes',
+  nodesDir: '/root/fractal-agent-system/node_modules',
 
   // By default, the Node-RED UI is available at http://localhost:1880/
   // The following property can be used to specify a different root path.
   // If set to false, this is disabled.
   httpRoot: "/",
+  
+  // The following property can be used to specify a different root path for the http-in nodes.
+  // If set to false, this is disabled.
+  httpNodeRoot: "/",
 
   // The following property can be used to add a custom middleware function
   // in front of all HTTP in nodes. This can be used to set custom headers, for
