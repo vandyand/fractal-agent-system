@@ -841,6 +841,10 @@ class AgentCommunicationHub {
     return agent;
   }
 
+  getAgent(agentId) {
+    return this.agents.get(agentId);
+  }
+
   async sendMessage(fromAgentId, toAgentId, message, data = {}) {
     const fromAgent = this.agents.get(fromAgentId);
     const toAgent = this.agents.get(toAgentId);

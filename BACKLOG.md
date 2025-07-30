@@ -32,6 +32,8 @@ Features successfully implemented and merged to main branch.
 - **Priority**: CRITICAL
 - **Dependencies**: None
 - **Description**: Web scraping framework with Puppeteer/Playwright and OpenAI JSON schema integration
+- **Required Tools**: `web_scraping_tool`, `news_aggregation_tool`, `sentiment_analysis_tool`
+- **Responsible Agents**: `team-web-research-001`, `specialized-competitive-intel-001`
 - **Acceptance Criteria**:
   - [ ] Web scraping with Puppeteer/Playwright
   - [ ] News aggregation from multiple sources
@@ -39,6 +41,8 @@ Features successfully implemented and merged to main branch.
   - [ ] Competitor website monitoring
   - [ ] JSON schema integration for structured output
   - [ ] Data storage and indexing system
+  - [ ] Node-RED flow implementation
+  - [ ] Tool Registry integration
 
 #### **1.2 Document Parser & Research Integration**
 - **Branch**: `feature/document-parser`
@@ -46,6 +50,8 @@ Features successfully implemented and merged to main branch.
 - **Priority**: CRITICAL
 - **Dependencies**: None
 - **Description**: General-purpose document parser with comprehensive schema support for all document types
+- **Required Tools**: `document_parser_tool`, `research_planning_tool`, `content_analysis_tool`
+- **Responsible Agents**: `board-cro-001`, `specialized-document-processor-001`, `team-scientific-research-001`
 - **Acceptance Criteria**:
   - [ ] Document parsing for multiple formats (PDF, DOCX, HTML, etc.)
   - [ ] Hierarchical section extraction with subsections
@@ -55,6 +61,8 @@ Features successfully implemented and merged to main branch.
   - [ ] AI-powered content analysis and summarization
   - [ ] Citation network analysis
   - [ ] Cross-disciplinary research synthesis
+  - [ ] Node-RED flow implementation
+  - [ ] Tool Registry integration
 
 #### **1.3 Financial Market Analysis**
 - **Branch**: `feature/financial-analysis`
