@@ -638,21 +638,23 @@ return msg;`,
       timestamp: new Date().toISOString(),
     };
 
-    fs.writeFileSync(filename, JSON.stringify(state, null, 2));
-    console.log(`💾 System state saved to: ${filename}`);
+    const stateFile = path.join(process.cwd(), "data/system", filename);
+    fs.writeFileSync(stateFile, JSON.stringify(state, null, 2));
+    console.log(`💾 System state saved to: ${stateFile}`);
   }
 
   // Load system state from file
   loadState(filename = "fractal_system_state.json") {
-    if (fs.existsSync(filename)) {
-      const state = JSON.parse(fs.readFileSync(filename, "utf8"));
+    const stateFile = path.join(process.cwd(), "data/system", filename);
+    if (fs.existsSync(stateFile)) {
+      const state = JSON.parse(fs.readFileSync(stateFile, "utf8"));
       this.deployedAgents = new Map(state.deployedAgents);
       this.spawnHistory = state.spawnHistory;
-      console.log(`📂 System state loaded from: ${filename}`);
+      console.log(`📂 System state loaded from: ${stateFile}`);
       console.log(`   Agents: ${this.deployedAgents.size}`);
       console.log(`   History: ${this.spawnHistory.length} events`);
     } else {
-      console.log(`📂 No state file found: ${filename}`);
+      console.log(`📂 No state file found: ${stateFile}`);
     }
   }
 
