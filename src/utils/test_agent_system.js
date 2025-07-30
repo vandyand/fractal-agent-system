@@ -5,7 +5,8 @@
  * 
  * This script demonstrates the agent system functionality, including:
  * - Agent creation and registration
- * - Capability execution with placeholders
+ * - Responsibility execution with placeholders
+ * - Tool execution through Tool Registry
  * - Inter-agent communication
  * - Performance tracking
  * - OpenAI integration placeholders
@@ -39,41 +40,42 @@ async function testAgentSystem() {
   }
   console.log('');
 
-  // Test 1: Agent capability execution with placeholders
-  console.log('🧪 Test 1: Agent Capability Execution (Placeholders)\n');
+  // Test 1: Agent responsibility execution with placeholders
+  console.log('🧪 Test 1: Agent Responsibility Execution (Placeholders)\n');
 
   const testCases = [
     {
       agentId: 'board-cao-001',
-      capability: 'strategic_planning',
+      responsibility: 'strategic_planning',
       data: { companyDirection: 'research-focused', marketFocus: 'AI services' }
     },
     {
       agentId: 'board-cfo-001',
-      capability: 'financial_reporting',
+      responsibility: 'financial_reporting',
       data: { period: 'Q1 2025', revenue: 50000, expenses: 30000 }
     },
     {
       agentId: 'specialized-document-processor-001',
-      capability: 'multi_format_parsing',
+      responsibility: 'multi_format_parsing',
       data: { documentUrl: 'https://example.com/research-paper.pdf', format: 'PDF' }
     },
     {
       agentId: 'specialized-financial-analyst-001',
-      capability: 'real_time_market_analysis',
+      responsibility: 'real_time_market_analysis',
       data: { symbols: ['AAPL', 'GOOGL', 'MSFT'], timeframe: '1d' }
     }
   ];
 
   for (const testCase of testCases) {
-    console.log(`📋 Testing ${testCase.agentId} - ${testCase.capability}`);
+    console.log(`📋 Testing ${testCase.agentId} - ${testCase.responsibility}`);
     try {
-      const result = await hub.executeCapability(
+      const result = await hub.executeResponsibility(
         testCase.agentId,
-        testCase.capability,
+        testCase.responsibility,
         testCase.data
       );
       console.log(`  Status: ${result.success ? '✅ Success' : '⚠️ Placeholder'}`);
+      console.log(`  Placeholder: ${result.placeholder ? 'Yes' : 'No'}`);
       console.log(`  Message: ${result.message.substring(0, 100)}...`);
       console.log('');
     } catch (error) {
@@ -82,8 +84,51 @@ async function testAgentSystem() {
     }
   }
 
-  // Test 2: Inter-agent communication
-  console.log('🧪 Test 2: Inter-Agent Communication\n');
+  // Test 2: Tool execution
+  console.log('🧪 Test 2: Tool Execution\n');
+
+  const toolTestCases = [
+    {
+      agentId: 'board-cao-001',
+      toolId: 'openai_json_schema',
+      data: { 
+        model: 'gpt-4.1-mini',
+        prompt: 'Analyze the current market trends',
+        schema: { type: 'object', properties: { analysis: { type: 'string' } } }
+      }
+    },
+    {
+      agentId: 'specialized-document-processor-001',
+      toolId: 'document_parser_tool',
+      data: { documentUrl: 'https://example.com/paper.pdf', documentType: 'research_paper' }
+    },
+    {
+      agentId: 'specialized-financial-analyst-001',
+      toolId: 'market_data_tool',
+      data: { symbols: ['AAPL', 'GOOGL'], timeframe: '1d' }
+    }
+  ];
+
+  for (const testCase of toolTestCases) {
+    console.log(`🔧 Testing tool execution: ${testCase.agentId} - ${testCase.toolId}`);
+    try {
+      const result = await hub.executeTool(
+        testCase.agentId,
+        testCase.toolId,
+        testCase.data
+      );
+      console.log(`  Status: ${result.success ? '✅ Success' : '⚠️ Placeholder'}`);
+      console.log(`  Placeholder: ${result.placeholder ? 'Yes' : 'No'}`);
+      console.log(`  Message: ${result.message.substring(0, 100)}...`);
+      console.log('');
+    } catch (error) {
+      console.log(`  ❌ Error: ${error.message}`);
+      console.log('');
+    }
+  }
+
+  // Test 3: Inter-agent communication
+  console.log('🧪 Test 3: Inter-Agent Communication\n');
 
   const communicationTests = [
     {
@@ -115,15 +160,17 @@ async function testAgentSystem() {
         commTest.message,
         commTest.data
       );
-      console.log(`  ✅ Communication sent (ID: ${result.communicationId})`);
+      console.log(`  Status: ${result.success ? '✅ Success' : '⚠️ Placeholder'}`);
+      console.log(`  Placeholder: ${result.placeholder ? 'Yes' : 'No'}`);
+      console.log(`  Communication ID: ${result.communicationId}`);
     } catch (error) {
       console.log(`  ❌ Communication failed: ${error.message}`);
     }
   }
   console.log('');
 
-  // Test 3: Performance tracking
-  console.log('🧪 Test 3: Performance Tracking\n');
+  // Test 4: Performance tracking
+  console.log('🧪 Test 4: Performance Tracking\n');
 
   // Simulate some performance metrics
   const agents = Array.from(hub.agents.values());
@@ -136,13 +183,35 @@ async function testAgentSystem() {
     console.log(`📊 ${agent.agentId} Performance Summary:`);
     const summary = agent.getPerformanceSummary();
     for (const [metric, data] of Object.entries(summary)) {
-      console.log(`  ${metric}: ${data.current} (avg: ${data.average.toFixed(2)}, trend: ${data.trend})`);
+      console.log(`  ${metric}: ${data.current} (avg: ${data.average.toFixed(2)}, trend: ${data.trend}, total: ${data.totalValues})`);
     }
     console.log('');
   }
 
-  // Test 4: Communication log
-  console.log('🧪 Test 4: Communication Log\n');
+  // Test 5: Agent capabilities and tools
+  console.log('🧪 Test 5: Agent Capabilities and Tools\n');
+
+  for (const agent of agents) {
+    console.log(`🤖 ${agent.agentId} (${agent.role}):`);
+    console.log(`  Responsibilities: ${agent.getResponsibilities().length}`);
+    console.log(`  Available Tools: ${agent.getAvailableTools().length}`);
+    
+    const responsibilities = agent.getResponsibilities();
+    console.log(`  Sample Responsibilities:`);
+    responsibilities.slice(0, 3).forEach(resp => {
+      console.log(`    • ${resp.name}: ${resp.description.substring(0, 50)}...`);
+    });
+    
+    const tools = agent.getAvailableTools();
+    console.log(`  Sample Tools:`);
+    tools.slice(0, 3).forEach(tool => {
+      console.log(`    • ${tool}`);
+    });
+    console.log('');
+  }
+
+  // Test 6: Communication log
+  console.log('🧪 Test 6: Communication Log\n');
   const communicationLog = hub.getCommunicationLog();
   console.log(`📋 Total communications: ${communicationLog.length}`);
   for (const comm of communicationLog) {
@@ -150,8 +219,8 @@ async function testAgentSystem() {
   }
   console.log('');
 
-  // Test 5: Hub performance summary
-  console.log('🧪 Test 5: Hub Performance Summary\n');
+  // Test 7: Hub performance summary
+  console.log('🧪 Test 7: Hub Performance Summary\n');
   const hubSummary = hub.getPerformanceSummary();
   console.log('📈 Hub Performance Summary:');
   for (const [agentId, summary] of Object.entries(hubSummary)) {
@@ -159,8 +228,8 @@ async function testAgentSystem() {
   }
   console.log('');
 
-  // Test 6: Agent factory
-  console.log('🧪 Test 6: Agent Factory\n');
+  // Test 8: Agent factory
+  console.log('🧪 Test 8: Agent Factory\n');
   console.log('🏭 Available agent IDs:');
   const allAgentIds = AgentFactory.getAllAgentIds();
   for (const agentId of allAgentIds) {
@@ -168,18 +237,25 @@ async function testAgentSystem() {
   }
   console.log('');
 
-  // Test 7: Error handling
-  console.log('🧪 Test 7: Error Handling\n');
+  // Test 9: Error handling
+  console.log('🧪 Test 9: Error Handling\n');
   
   try {
-    await hub.executeCapability('invalid-agent', 'invalid-capability', {});
+    await hub.executeResponsibility('invalid-agent', 'invalid-responsibility', {});
     console.log('❌ Should have thrown an error');
   } catch (error) {
     console.log(`✅ Error handled correctly: ${error.message}`);
   }
 
   try {
-    await hub.executeCapability('board-cao-001', 'invalid-capability', {});
+    await hub.executeResponsibility('board-cao-001', 'invalid-responsibility', {});
+    console.log('❌ Should have thrown an error');
+  } catch (error) {
+    console.log(`✅ Error handled correctly: ${error.message}`);
+  }
+
+  try {
+    await hub.executeTool('board-cao-001', 'unauthorized_tool', {});
     console.log('❌ Should have thrown an error');
   } catch (error) {
     console.log(`✅ Error handled correctly: ${error.message}`);
@@ -190,11 +266,18 @@ async function testAgentSystem() {
   console.log('📋 Summary:');
   console.log(`  • Agents registered: ${hub.agents.size}`);
   console.log(`  • Communications logged: ${hub.getCommunicationLog().length}`);
-  console.log(`  • Capabilities tested: ${testCases.length}`);
+  console.log(`  • Responsibilities tested: ${testCases.length}`);
+  console.log(`  • Tools tested: ${toolTestCases.length}`);
   console.log(`  • Performance metrics tracked: ${Object.keys(hub.getPerformanceSummary()).length}`);
   console.log('');
   console.log('🚀 The autonomous digital company agent system is ready for implementation!');
-  console.log('📋 Next steps: Implement real capabilities based on the roadmap and backlog.');
+  console.log('📋 Next steps: Implement real tools and responsibilities based on the roadmap and backlog.');
+  console.log('');
+  console.log('🏗️ Architecture Overview:');
+  console.log('  • Agents have RESPONSIBILITIES (what they are responsible for)');
+  console.log('  • Agents have access to TOOLS (Node-RED flows they can execute)');
+  console.log('  • Tools are managed by the Tool Registry');
+  console.log('  • All placeholders are clearly marked for implementation');
 }
 
 // Run the test if this file is executed directly
