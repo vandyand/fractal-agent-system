@@ -53,9 +53,15 @@
         "maxTokens": {
           "type": "integer",
           "minimum": 1,
-          "maximum": 4000,
+          "maximum": 32000,
           "default": 1000,
-          "description": "Maximum tokens for response"
+          "description": "Maximum tokens for response (higher for reports, lower for simple queries)"
+        },
+        "taskType": {
+          "type": "string",
+          "enum": ["simple_query", "analysis", "report_generation", "document_parsing", "content_creation"],
+          "default": "simple_query",
+          "description": "Type of task to optimize token usage"
         }
       },
       "required": ["model", "prompt", "schema"]
@@ -157,6 +163,242 @@
         }
       },
       "required": ["url", "title", "content"]
+    },
+    "documentParserSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Document title"
+        },
+        "documentType": {
+          "type": "string",
+          "enum": ["research_paper", "business_report", "technical_document", "academic_paper", "financial_report", "legal_document", "other"],
+          "description": "Type of document being parsed"
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of authors/contributors"
+        },
+        "abstract": {
+          "type": "string",
+          "description": "Document abstract or executive summary"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Keywords associated with the document"
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Publication date"
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the document"
+        },
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Section title"
+              },
+              "level": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 6,
+                "description": "Heading level (1-6)"
+              },
+              "content": {
+                "type": "string",
+                "description": "Section content"
+              },
+              "subsections": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/schemas/documentParserSchema/properties/sections/items"
+                },
+                "description": "Nested subsections"
+              }
+            },
+            "required": ["title", "level", "content"]
+          },
+          "description": "Document sections with hierarchical structure"
+        },
+        "figures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Figure identifier"
+              },
+              "title": {
+                "type": "string",
+                "description": "Figure title"
+              },
+              "caption": {
+                "type": "string",
+                "description": "Figure caption"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "description": "URL to figure image"
+              },
+              "altText": {
+                "type": "string",
+                "description": "Alternative text for accessibility"
+              }
+            },
+            "required": ["id", "title"]
+          },
+          "description": "Figures and images in the document"
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Table identifier"
+              },
+              "title": {
+                "type": "string",
+                "description": "Table title"
+              },
+              "caption": {
+                "type": "string",
+                "description": "Table caption"
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "description": "Table column headers"
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "description": "Table data rows"
+              }
+            },
+            "required": ["id", "title", "headers", "rows"]
+          },
+          "description": "Tables in the document"
+        },
+        "equations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Equation identifier"
+              },
+              "equation": {
+                "type": "string",
+                "description": "Mathematical equation (LaTeX format)"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the equation"
+              }
+            },
+            "required": ["id", "equation"]
+          },
+          "description": "Mathematical equations in the document"
+        },
+        "codeBlocks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Code block identifier"
+              },
+              "language": {
+                "type": "string",
+                "description": "Programming language"
+              },
+              "code": {
+                "type": "string",
+                "description": "Code content"
+              },
+              "description": {
+                "type": "string",
+                "description": "Description of the code"
+              }
+            },
+            "required": ["id", "code"]
+          },
+          "description": "Code blocks in the document"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of cited references"
+        },
+        "summary": {
+          "type": "string",
+          "description": "AI-generated summary"
+        },
+        "keyFindings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key findings from the document"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "wordCount": {
+              "type": "integer"
+            },
+            "pageCount": {
+              "type": "integer"
+            },
+            "language": {
+              "type": "string"
+            },
+            "fileSize": {
+              "type": "integer"
+            },
+            "fileType": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "required": ["title", "documentType", "sections"]
     },
     "researchPaperSchema": {
       "type": "object",
@@ -284,9 +526,17 @@
           "type": "string",
           "enum": ["stock", "crypto", "forex", "commodity"],
           "description": "Type of market"
+        },
+        "broker": {
+          "type": ["string", "null"],
+          "description": "Broker providing the data (null if not applicable)"
+        },
+        "tradeable": {
+          "type": "boolean",
+          "description": "Whether the asset is currently tradeable"
         }
       },
-      "required": ["symbol", "name", "price", "timestamp", "marketType"]
+      "required": ["symbol", "name", "price", "timestamp", "marketType", "tradeable"]
     },
     "reportSchema": {
       "type": "object",
@@ -300,8 +550,13 @@
         },
         "type": {
           "type": "string",
-          "enum": ["market_analysis", "competitive_intelligence", "financial_analysis", "research_summary"],
+          "enum": ["market_analysis", "competitive_intelligence", "financial_analysis", "research_summary", "business_report", "technical_report", "executive_summary"],
           "description": "Type of report"
+        },
+        "template": {
+          "type": "string",
+          "enum": ["powerpoint", "financial_report", "business_document", "technical_document", "executive_summary", "custom"],
+          "description": "Report template type"
         },
         "summary": {
           "type": "string",
@@ -320,11 +575,139 @@
               },
               "data": {
                 "type": "object"
+              },
+              "order": {
+                "type": "integer",
+                "description": "Section order in the report"
               }
             },
-            "required": ["title", "content"]
+            "required": ["title", "content", "order"]
           },
           "description": "Report sections"
+        },
+        "graphs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["line", "bar", "pie", "scatter", "area", "histogram", "heatmap", "candlestick", "custom"]
+              },
+              "data": {
+                "type": "object",
+                "description": "Graph data in structured format"
+              },
+              "config": {
+                "type": "object",
+                "description": "Graph configuration options"
+              },
+              "caption": {
+                "type": "string"
+              },
+              "section": {
+                "type": "string",
+                "description": "Section where graph should appear"
+              }
+            },
+            "required": ["id", "title", "type", "data"]
+          },
+          "description": "Graphs and charts in the report"
+        },
+        "figures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "url": {
+                "type": "string",
+                "format": "uri"
+              },
+              "caption": {
+                "type": "string"
+              },
+              "altText": {
+                "type": "string"
+              },
+              "section": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "title"]
+          },
+          "description": "Figures and images in the report"
+        },
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "headers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "rows": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              },
+              "caption": {
+                "type": "string"
+              },
+              "section": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "title", "headers", "rows"]
+          },
+          "description": "Tables in the report"
+        },
+        "equations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "equation": {
+                "type": "string",
+                "description": "Mathematical equation (LaTeX format)"
+              },
+              "description": {
+                "type": "string"
+              },
+              "section": {
+                "type": "string"
+              }
+            },
+            "required": ["id", "equation"]
+          },
+          "description": "Mathematical equations in the report"
         },
         "keyInsights": {
           "type": "array",
@@ -347,13 +730,44 @@
           },
           "description": "Sources of data used in the report"
         },
+        "outputFormats": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pdf", "docx", "pptx", "html", "json", "markdown", "latex"]
+          },
+          "description": "Available output formats for the report"
+        },
         "generatedAt": {
           "type": "string",
           "format": "date-time",
           "description": "When the report was generated"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "wordCount": {
+              "type": "integer"
+            },
+            "pageCount": {
+              "type": "integer"
+            },
+            "graphCount": {
+              "type": "integer"
+            },
+            "tableCount": {
+              "type": "integer"
+            },
+            "figureCount": {
+              "type": "integer"
+            },
+            "equationCount": {
+              "type": "integer"
+            }
+          }
         }
       },
-      "required": ["title", "type", "summary", "sections"]
+      "required": ["title", "type", "template", "summary", "sections", "outputFormats"]
     },
     "apiEndpointSchema": {
       "type": "object",
