@@ -1,0 +1,481 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Autonomous Digital Company - Base Schemas",
+  "description": "Core JSON schemas for the autonomous digital company system",
+  "definitions": {
+    "baseEntity": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the entity"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the entity was created"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the entity was last updated"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional metadata for the entity"
+        }
+      },
+      "required": ["id", "createdAt", "updatedAt"]
+    },
+    "openAIRequest": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "enum": ["gpt-4.1-mini", "gpt-4.1-nano"],
+          "description": "OpenAI model to use for processing"
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Input prompt for the AI model"
+        },
+        "schema": {
+          "type": "object",
+          "description": "JSON schema for structured output"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 2,
+          "default": 0.7,
+          "description": "Temperature for response generation"
+        },
+        "maxTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 4000,
+          "default": 1000,
+          "description": "Maximum tokens for response"
+        }
+      },
+      "required": ["model", "prompt", "schema"]
+    },
+    "openAIResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether the request was successful"
+        },
+        "data": {
+          "type": "object",
+          "description": "Structured data according to the provided schema"
+        },
+        "error": {
+          "type": "string",
+          "description": "Error message if request failed"
+        },
+        "usage": {
+          "type": "object",
+          "properties": {
+            "promptTokens": {
+              "type": "integer",
+              "description": "Number of tokens used in prompt"
+            },
+            "completionTokens": {
+              "type": "integer",
+              "description": "Number of tokens used in completion"
+            },
+            "totalTokens": {
+              "type": "integer",
+              "description": "Total tokens used"
+            }
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp of the response"
+        }
+      },
+      "required": ["success", "timestamp"]
+    }
+  },
+  "schemas": {
+    "webScrapingSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL of the scraped webpage"
+        },
+        "title": {
+          "type": "string",
+          "description": "Page title"
+        },
+        "content": {
+          "type": "string",
+          "description": "Extracted content from the page"
+        },
+        "links": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Links found on the page"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uri"
+          },
+          "description": "Images found on the page"
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {
+            "scrapedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "statusCode": {
+              "type": "integer"
+            },
+            "contentType": {
+              "type": "string"
+            },
+            "wordCount": {
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "required": ["url", "title", "content"]
+    },
+    "researchPaperSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title of the research paper"
+        },
+        "authors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of authors"
+        },
+        "abstract": {
+          "type": "string",
+          "description": "Abstract of the paper"
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Keywords associated with the paper"
+        },
+        "publicationDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Publication date"
+        },
+        "journal": {
+          "type": "string",
+          "description": "Journal or conference name"
+        },
+        "doi": {
+          "type": "string",
+          "description": "Digital Object Identifier"
+        },
+        "citations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of cited papers"
+        },
+        "summary": {
+          "type": "string",
+          "description": "AI-generated summary"
+        },
+        "keyFindings": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key findings from the paper"
+        },
+        "source": {
+          "type": "string",
+          "enum": ["pubmed", "arxiv", "other"],
+          "description": "Source database"
+        }
+      },
+      "required": ["title", "authors", "abstract", "source"]
+    },
+    "marketDataSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "symbol": {
+          "type": "string",
+          "description": "Market symbol (e.g., AAPL, BTC)"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the asset"
+        },
+        "price": {
+          "type": "number",
+          "description": "Current price"
+        },
+        "change": {
+          "type": "number",
+          "description": "Price change from previous period"
+        },
+        "changePercent": {
+          "type": "number",
+          "description": "Percentage change"
+        },
+        "volume": {
+          "type": "number",
+          "description": "Trading volume"
+        },
+        "marketCap": {
+          "type": "number",
+          "description": "Market capitalization"
+        },
+        "high": {
+          "type": "number",
+          "description": "Day's high"
+        },
+        "low": {
+          "type": "number",
+          "description": "Day's low"
+        },
+        "open": {
+          "type": "number",
+          "description": "Opening price"
+        },
+        "previousClose": {
+          "type": "number",
+          "description": "Previous closing price"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Data timestamp"
+        },
+        "marketType": {
+          "type": "string",
+          "enum": ["stock", "crypto", "forex", "commodity"],
+          "description": "Type of market"
+        }
+      },
+      "required": ["symbol", "name", "price", "timestamp", "marketType"]
+    },
+    "reportSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Report title"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["market_analysis", "competitive_intelligence", "financial_analysis", "research_summary"],
+          "description": "Type of report"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Executive summary"
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "content": {
+                "type": "string"
+              },
+              "data": {
+                "type": "object"
+              }
+            },
+            "required": ["title", "content"]
+          },
+          "description": "Report sections"
+        },
+        "keyInsights": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Key insights from the report"
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Actionable recommendations"
+        },
+        "dataSources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sources of data used in the report"
+        },
+        "generatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the report was generated"
+        }
+      },
+      "required": ["title", "type", "summary", "sections"]
+    },
+    "apiEndpointSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "path": {
+          "type": "string",
+          "description": "API endpoint path"
+        },
+        "method": {
+          "type": "string",
+          "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"],
+          "description": "HTTP method"
+        },
+        "description": {
+          "type": "string",
+          "description": "Endpoint description"
+        },
+        "parameters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "required": {
+                "type": "boolean"
+              },
+              "description": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "type"]
+          }
+        },
+        "requestSchema": {
+          "type": "object",
+          "description": "JSON schema for request body"
+        },
+        "responseSchema": {
+          "type": "object",
+          "description": "JSON schema for response"
+        },
+        "rateLimit": {
+          "type": "object",
+          "properties": {
+            "requests": {
+              "type": "integer"
+            },
+            "window": {
+              "type": "string"
+            }
+          }
+        },
+        "authentication": {
+          "type": "boolean",
+          "description": "Whether authentication is required"
+        }
+      },
+      "required": ["path", "method", "description"]
+    },
+    "serviceSchema": {
+      "type": "object",
+      "allOf": [
+        { "$ref": "#/definitions/baseEntity" }
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Service name"
+        },
+        "description": {
+          "type": "string",
+          "description": "Service description"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["research", "analysis", "reporting", "consulting"],
+          "description": "Type of service"
+        },
+        "price": {
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "number"
+            },
+            "currency": {
+              "type": "string",
+              "default": "USD"
+            },
+            "billingModel": {
+              "type": "string",
+              "enum": ["per_request", "subscription", "one_time"]
+            }
+          },
+          "required": ["amount", "billingModel"]
+        },
+        "deliveryTime": {
+          "type": "string",
+          "description": "Expected delivery time"
+        },
+        "requirements": {
+          "type": "object",
+          "description": "Input requirements schema"
+        },
+        "output": {
+          "type": "object",
+          "description": "Output schema"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "inactive", "maintenance"],
+          "default": "active"
+        }
+      },
+      "required": ["name", "description", "type", "price", "requirements", "output"]
+    }
+  }
+} 
