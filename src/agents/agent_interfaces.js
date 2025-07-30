@@ -154,7 +154,7 @@ class AgentInterface {
    */
   async callOpenAI(prompt, schema, options = {}) {
     const request = {
-      model: options.model || 'gpt-4.1-mini',
+      model: options.model || 'gpt-4.1-mini', // Default to cost-effective model
       prompt: prompt,
       schema: schema,
       temperature: options.temperature || 0.7,

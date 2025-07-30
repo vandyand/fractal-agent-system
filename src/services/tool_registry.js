@@ -179,9 +179,9 @@ class ToolRegistry {
     }
 
     try {
-      // For OpenAI JSON Schema tool, use the specific API endpoint
+      // For OpenAI JSON Schema tool, use direct API call
       if (tool.id === 'openai_json_schema') {
-        return await this.executeOpenAIFlow(inputData, options);
+        return await this.executeDirectOpenAICall(inputData, options);
       }
 
       // For other tools, use the generic flow execution endpoint
@@ -242,50 +242,34 @@ class ToolRegistry {
     }
   }
 
-  /**
-   * Execute OpenAI flow via Node-RED API
-   */
-  async executeOpenAIFlow(inputData, options = {}) {
-    try {
-      console.log('🤖 Executing OpenAI API call via Node-RED...');
-      
-      const response = await axios.post(
-        `${this.config.nodeRedUrl}/api/openai/json-schema`,
-        inputData,
-        {
-          timeout: options.timeout || 60000, // Longer timeout for AI calls
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      );
 
-      if (response.data.success) {
-        console.log('✅ OpenAI API call successful');
-        return response.data;
-      } else {
-        throw new Error(response.data.error || 'OpenAI API call failed');
-      }
-
-    } catch (error) {
-      if (error.response && error.response.status === 404) {
-        // Node-RED endpoint not found - try direct OpenAI API call
-        console.log('🔄 Node-RED endpoint not found, trying direct OpenAI API call...');
-        return await this.executeDirectOpenAICall(inputData, options);
-      }
-      throw new Error(`OpenAI flow execution failed: ${error.message}`);
-    }
-  }
 
   /**
-   * Execute direct OpenAI API call (fallback)
+   * Execute direct OpenAI API call
    */
   async executeDirectOpenAICall(inputData, options = {}) {
     try {
-      console.log('🤖 Executing direct OpenAI API call...');
+      console.log('🤖 Executing OpenAI API call...');
       
       if (!process.env.OPENAI_API_KEY) {
         throw new Error('OPENAI_API_KEY environment variable not set');
+      }
+
+      // Validate and set default model for cost-effectiveness
+      let model = inputData.model;
+      if (!model || !['gpt-4.1-mini', 'gpt-4.1-nano'].includes(model)) {
+        model = 'gpt-4.1-mini'; // Default to cost-effective model
+        console.log(`🔄 Using cost-effective model: ${model}`);
+      }
+
+      // Optimize token usage based on task type
+      let maxTokens = inputData.maxTokens || 1000;
+      if (inputData.taskType === 'simple_query') {
+        maxTokens = Math.min(maxTokens, 500);
+      } else if (inputData.taskType === 'analysis') {
+        maxTokens = Math.min(maxTokens, 1500);
+      } else if (inputData.taskType === 'report_generation') {
+        maxTokens = Math.min(maxTokens, 3000);
       }
 
       const startTime = Date.now();
@@ -293,12 +277,12 @@ class ToolRegistry {
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
-          model: inputData.model,
+          model: model,
           response_format: { type: 'json_object' },
           messages: [
             {
               role: 'system',
-              content: `You are a helpful AI assistant that responds with valid JSON according to the provided schema. Always ensure your response is a valid JSON object that matches the schema exactly.`
+              content: `You are a helpful AI assistant that responds with valid JSON according to the provided schema. Always ensure your response is a valid JSON object that matches the schema exactly. Be concise and efficient in your responses.`
             },
             {
               role: 'user',
@@ -306,7 +290,7 @@ class ToolRegistry {
             }
           ],
           temperature: inputData.temperature || 0.7,
-          max_tokens: inputData.maxTokens || 1000
+          max_tokens: maxTokens
         },
         {
           headers: {
@@ -593,20 +577,31 @@ class ToolRegistry {
       {
         id: 'openai_json_schema',
         name: 'OpenAI JSON Schema API',
-        description: 'Execute OpenAI API calls with JSON schema validation',
+        description: 'Execute OpenAI API calls with JSON schema validation using cost-effective models',
         category: 'integration',
         nodeRedFlowId: 'openai_json_schema_flow',
         nodeRedFlow: await this.loadNodeRedFlow('openai_json_schema'),
         inputSchema: {
           type: 'object',
           properties: {
-            model: { type: 'string' },
+            model: { 
+              type: 'string',
+              enum: ['gpt-4.1-mini', 'gpt-4.1-nano'],
+              default: 'gpt-4.1-mini',
+              description: 'Cost-effective OpenAI model'
+            },
             prompt: { type: 'string' },
             schema: { type: 'object' },
-            temperature: { type: 'number' },
-            maxTokens: { type: 'number' }
+            temperature: { type: 'number', default: 0.7 },
+            maxTokens: { type: 'number', default: 1000 },
+            taskType: {
+              type: 'string',
+              enum: ['simple_query', 'analysis', 'report_generation'],
+              default: 'simple_query',
+              description: 'Task type for token optimization'
+            }
           },
-          required: ['model', 'prompt', 'schema']
+          required: ['prompt', 'schema']
         },
         outputSchema: {
           type: 'object',
@@ -621,7 +616,7 @@ class ToolRegistry {
         status: 'active',
         version: '1.0.0',
         author: 'system',
-        tags: ['openai', 'api', 'json-schema', 'ai']
+        tags: ['openai', 'api', 'json-schema', 'ai', 'cost-effective']
       },
       {
         id: 'web_scraping_tool',

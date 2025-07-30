@@ -76,11 +76,12 @@ async function testOpenAIIntegration() {
     console.log(`  Schema: ${Object.keys(testSchema.properties).join(', ')}`);
     
     const result = await toolRegistry.executeTool('openai_json_schema', {
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1-mini',
       prompt: testPrompt,
       schema: testSchema,
       temperature: 0.7,
-      maxTokens: 1000
+      maxTokens: 1000,
+      taskType: 'analysis'
     });
 
     console.log('✅ Direct OpenAI API call successful!');
@@ -108,7 +109,7 @@ async function testOpenAIIntegration() {
     console.log('📋 Testing CAO using OpenAI for strategic analysis...');
     
     const agentResult = await caoAgent.executeTool('openai_json_schema', {
-      model: 'gpt-4o-mini',
+      model: 'gpt-4.1-mini',
       prompt: 'What are the top 3 strategic priorities for an AI research company in 2025?',
       schema: {
         type: 'object',
@@ -128,7 +129,8 @@ async function testOpenAIIntegration() {
           timeline: { type: 'string' }
         },
         required: ['priorities', 'rationale']
-      }
+      },
+      taskType: 'analysis'
     });
 
     console.log('✅ Agent-tool integration successful!');
@@ -219,11 +221,12 @@ async function testOpenAIIntegration() {
       console.log(`📋 Testing: ${useCase.name}`);
       
       const result = await toolRegistry.executeTool('openai_json_schema', {
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         prompt: useCase.prompt,
         schema: useCase.schema,
         temperature: 0.7,
-        maxTokens: 1500
+        maxTokens: 1500,
+        taskType: 'analysis'
       });
 
       console.log(`  ✅ ${useCase.name} successful`);
@@ -257,7 +260,7 @@ async function testOpenAIIntegration() {
     {
       name: 'Invalid Model',
       input: {
-        model: 'invalid-model',
+        model: 'gpt-4o-mini', // Invalid model (should be gpt-4.1-mini or gpt-4.1-nano)
         prompt: 'Test prompt',
         schema: { type: 'object', properties: { test: { type: 'string' } } }
       }
@@ -265,14 +268,14 @@ async function testOpenAIIntegration() {
     {
       name: 'Missing Prompt',
       input: {
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         schema: { type: 'object', properties: { test: { type: 'string' } } }
       }
     },
     {
       name: 'Invalid Schema',
       input: {
-        model: 'gpt-4o-mini',
+        model: 'gpt-4.1-mini',
         prompt: 'Test prompt',
         schema: 'invalid-schema'
       }
