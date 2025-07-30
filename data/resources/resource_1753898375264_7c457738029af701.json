@@ -1,0 +1,19 @@
+{
+  "id": "resource_1753898375264_7c457738029af701",
+  "name": "Market Analysis Report",
+  "type": "report",
+  "metadata": {},
+  "agentId": "market_analyst",
+  "accessLevel": "public",
+  "tags": [
+    "market",
+    "analysis",
+    "report"
+  ],
+  "version": 1,
+  "createdAt": "2025-07-30T17:59:35.264Z",
+  "updatedAt": "2025-07-30T17:59:35.264Z",
+  "size": 88,
+  "checksum": "2d3c9de1f2f164440aa859d41000b7c20c7a30e2202b7d22efc90888dd4682e1",
+  "filePath": "data/resources/resource_1753898375264_7c457738029af701.json"
+}

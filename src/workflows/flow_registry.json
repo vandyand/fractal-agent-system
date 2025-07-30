@@ -1,0 +1,207 @@
+[
+  {
+    "id": "flow_registry_tab",
+    "type": "tab",
+    "label": "Flow Registry",
+    "disabled": false,
+    "info": "Central registry for all available flows and their execution status"
+  },
+  {
+    "id": "registry_api",
+    "type": "http in",
+    "z": "flow_registry_tab",
+    "name": "Registry API",
+    "url": "/api/registry/:action",
+    "method": "post",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 150,
+    "y": 100,
+    "wires": [["registry_processor"]]
+  },
+  {
+    "id": "registry_processor",
+    "type": "function",
+    "z": "flow_registry_tab",
+    "name": "Registry Processor",
+    "func": "// Process registry API requests\n\nconst action = msg.req.params.action;\nconst data = msg.payload;\n\n// Available registry actions\nconst actions = {\n    'register': () => registerFlow(data),\n    'unregister': () => unregisterFlow(data),\n    'list': () => listFlows(),\n    'status': () => getFlowStatus(data),\n    'update': () => updateFlow(data),\n    'trigger': () => triggerFlow(data)\n};\n\nif (actions[action]) {\n    try {\n        const result = actions[action]();\n        msg.payload = {\n            success: true,\n            action: action,\n            data: result,\n            timestamp: new Date().toISOString()\n        };\n    } catch (error) {\n        msg.payload = {\n            success: false,\n            action: action,\n            error: error.message,\n            timestamp: new Date().toISOString()\n        };\n    }\n} else {\n    msg.payload = {\n        success: false,\n        action: action,\n        error: 'Unknown action',\n        timestamp: new Date().toISOString()\n    };\n}\n\nreturn msg;\n\n// Registry functions\nfunction registerFlow(flowData) {\n    const flow = {\n        id: flowData.id || `flow_${Date.now()}`,\n        name: flowData.name,\n        type: flowData.type,\n        description: flowData.description,\n        agent: flowData.agent,\n        status: 'registered',\n        priority: flowData.priority || 'medium',\n        trigger: flowData.trigger || 'manual',\n        schedule: flowData.schedule || null,\n        lastExecuted: null,\n        executionCount: 0,\n        successRate: 0,\n        averageExecutionTime: 0,\n        registeredAt: new Date().toISOString(),\n        config: flowData.config || {}\n    };\n    \n    // Store in global context (in real implementation, this would be a database)\n    global.flowRegistry = global.flowRegistry || {};\n    global.flowRegistry[flow.id] = flow;\n    \n    return flow;\n}\n\nfunction unregisterFlow(flowData) {\n    const flowId = flowData.id;\n    if (global.flowRegistry && global.flowRegistry[flowId]) {\n        delete global.flowRegistry[flowId];\n        return { message: `Flow ${flowId} unregistered` };\n    }\n    throw new Error(`Flow ${flowId} not found`);\n}\n\nfunction listFlows() {\n    global.flowRegistry = global.flowRegistry || {};\n    return Object.values(global.flowRegistry);\n}\n\nfunction getFlowStatus(flowData) {\n    const flowId = flowData.id;\n    if (global.flowRegistry && global.flowRegistry[flowId]) {\n        return global.flowRegistry[flowId];\n    }\n    throw new Error(`Flow ${flowId} not found`);\n}\n\nfunction updateFlow(flowData) {\n    const flowId = flowData.id;\n    if (global.flowRegistry && global.flowRegistry[flowId]) {\n        global.flowRegistry[flowId] = {\n            ...global.flowRegistry[flowId],\n            ...flowData,\n            updatedAt: new Date().toISOString()\n        };\n        return global.flowRegistry[flowId];\n    }\n    throw new Error(`Flow ${flowId} not found`);\n}\n\nfunction triggerFlow(flowData) {\n    const flowId = flowData.id;\n    if (global.flowRegistry && global.flowRegistry[flowId]) {\n        const flow = global.flowRegistry[flowId];\n        \n        // Update execution stats\n        flow.lastExecuted = new Date().toISOString();\n        flow.executionCount += 1;\n        \n        // In a real implementation, this would trigger the actual flow\n        return {\n            message: `Flow ${flowId} triggered`,\n            flow: flow\n        };\n    }\n    throw new Error(`Flow ${flowId} not found`);\n}",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 400,
+    "y": 100,
+    "wires": [["registry_response"]]
+  },
+  {
+    "id": "registry_response",
+    "type": "http response",
+    "z": "flow_registry_tab",
+    "name": "Registry Response",
+    "statusCode": "200",
+    "headers": {},
+    "x": 650,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "flow_monitor",
+    "type": "inject",
+    "z": "flow_registry_tab",
+    "name": "Flow Monitor",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "60",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"action\": \"monitor\"}",
+    "payloadType": "json",
+    "x": 150,
+    "y": 200,
+    "wires": [["monitor_processor"]]
+  },
+  {
+    "id": "monitor_processor",
+    "type": "function",
+    "z": "flow_registry_tab",
+    "name": "Monitor Processor",
+    "func": "// Monitor all registered flows and their health\n\nconst { action } = msg.payload;\n\nif (action === 'monitor') {\n    global.flowRegistry = global.flowRegistry || {};\n    \n    const flows = Object.values(global.flowRegistry);\n    const stats = {\n        totalFlows: flows.length,\n        activeFlows: flows.filter(f => f.status === 'active').length,\n        registeredFlows: flows.filter(f => f.status === 'registered').length,\n        failedFlows: flows.filter(f => f.status === 'failed').length,\n        totalExecutions: flows.reduce((sum, f) => sum + f.executionCount, 0),\n        averageSuccessRate: flows.length > 0 ? \n            flows.reduce((sum, f) => sum + f.successRate, 0) / flows.length : 0,\n        timestamp: new Date().toISOString()\n    };\n    \n    // Check for flows that need attention\n    const needsAttention = flows.filter(f => {\n        return f.status === 'failed' || \n               (f.lastExecuted && Date.now() - new Date(f.lastExecuted).getTime() > 3600000); // 1 hour\n    });\n    \n    msg.payload = {\n        action: 'monitor',\n        stats,\n        needsAttention,\n        flows: flows.map(f => ({\n            id: f.id,\n            name: f.name,\n            status: f.status,\n            lastExecuted: f.lastExecuted,\n            executionCount: f.executionCount,\n            successRate: f.successRate\n        }))\n    };\n}\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 400,
+    "y": 200,
+    "wires": [["monitor_dashboard"]]
+  },
+  {
+    "id": "monitor_dashboard",
+    "type": "debug",
+    "z": "flow_registry_tab",
+    "name": "Monitor Dashboard",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 650,
+    "y": 200,
+    "wires": []
+  },
+  {
+    "id": "flow_trigger",
+    "type": "inject",
+    "z": "flow_registry_tab",
+    "name": "Trigger Flow",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"action\": \"trigger\", \"flowId\": \"example_flow\"}",
+    "payloadType": "json",
+    "x": 150,
+    "y": 300,
+    "wires": [["trigger_processor"]]
+  },
+  {
+    "id": "trigger_processor",
+    "type": "function",
+    "z": "flow_registry_tab",
+    "name": "Trigger Processor",
+    "func": "// Process flow trigger requests\n\nconst { action, flowId } = msg.payload;\n\nif (action === 'trigger' && flowId) {\n    global.flowRegistry = global.flowRegistry || {};\n    \n    if (global.flowRegistry[flowId]) {\n        const flow = global.flowRegistry[flowId];\n        \n        // Update flow status\n        flow.status = 'running';\n        flow.lastExecuted = new Date().toISOString();\n        flow.executionCount += 1;\n        \n        // Simulate flow execution\n        const executionTime = Math.random() * 5000 + 1000;\n        const success = Math.random() > 0.1; // 90% success rate\n        \n        setTimeout(() => {\n            flow.status = success ? 'active' : 'failed';\n            flow.successRate = success ? 1 : 0;\n            flow.averageExecutionTime = executionTime;\n            \n            console.log(`Flow ${flowId} execution completed: ${success ? 'SUCCESS' : 'FAILED'}`);\n        }, executionTime);\n        \n        msg.payload = {\n            action: 'trigger',\n            flowId,\n            status: 'triggered',\n            message: `Flow ${flowId} triggered successfully`,\n            timestamp: new Date().toISOString()\n        };\n    } else {\n        msg.payload = {\n            action: 'trigger',\n            flowId,\n            status: 'error',\n            message: `Flow ${flowId} not found`,\n            timestamp: new Date().toISOString()\n        };\n    }\n}\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 400,
+    "y": 300,
+    "wires": [["trigger_response"]]
+  },
+  {
+    "id": "trigger_response",
+    "type": "debug",
+    "z": "flow_registry_tab",
+    "name": "Trigger Response",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 650,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "register_example_flow",
+    "type": "inject",
+    "z": "flow_registry_tab",
+    "name": "Register Example Flow",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "{\"action\": \"register\", \"id\": \"example_flow\", \"name\": \"Example Business Flow\", \"type\": \"business_process\", \"description\": \"An example business process flow\", \"agent\": \"business_executor\", \"priority\": \"high\", \"trigger\": \"scheduled\", \"schedule\": \"0 */5 * * * *\"}",
+    "payloadType": "json",
+    "x": 150,
+    "y": 400,
+    "wires": [["register_processor"]]
+  },
+  {
+    "id": "register_processor",
+    "type": "function",
+    "z": "flow_registry_tab",
+    "name": "Register Processor",
+    "func": "// Process flow registration\n\nconst { action, ...flowData } = msg.payload;\n\nif (action === 'register') {\n    global.flowRegistry = global.flowRegistry || {};\n    \n    const flow = {\n        id: flowData.id || `flow_${Date.now()}`,\n        name: flowData.name,\n        type: flowData.type,\n        description: flowData.description,\n        agent: flowData.agent,\n        status: 'registered',\n        priority: flowData.priority || 'medium',\n        trigger: flowData.trigger || 'manual',\n        schedule: flowData.schedule || null,\n        lastExecuted: null,\n        executionCount: 0,\n        successRate: 0,\n        averageExecutionTime: 0,\n        registeredAt: new Date().toISOString(),\n        config: flowData.config || {}\n    };\n    \n    global.flowRegistry[flow.id] = flow;\n    \n    msg.payload = {\n        action: 'register',\n        success: true,\n        flow: flow,\n        message: `Flow ${flow.id} registered successfully`,\n        timestamp: new Date().toISOString()\n    };\n}\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 400,
+    "y": 400,
+    "wires": [["register_response"]]
+  },
+  {
+    "id": "register_response",
+    "type": "debug",
+    "z": "flow_registry_tab",
+    "name": "Register Response",
+    "active": true,
+    "tosidebar": true,
+    "console": false,
+    "tostatus": false,
+    "complete": "payload",
+    "targetType": "msg",
+    "statusVal": "",
+    "statusType": "auto",
+    "x": 650,
+    "y": 400,
+    "wires": []
+  }
+] 

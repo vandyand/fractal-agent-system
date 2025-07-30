@@ -1,0 +1,20 @@
+{
+  "id": "resource_1753898375250_9a1f42b7307de68f",
+  "name": "Company Strategy Document",
+  "type": "document",
+  "metadata": {},
+  "agentId": "strategy_planner",
+  "accessLevel": "public",
+  "tags": [
+    "strategy",
+    "business",
+    "planning",
+    "updated"
+  ],
+  "version": 2,
+  "createdAt": "2025-07-30T17:59:35.250Z",
+  "updatedAt": "2025-07-30T17:59:35.269Z",
+  "size": 163,
+  "checksum": "1f225387c32757e391c760396e8b114e36c33332cd4f03a7d7931f715a6873fd",
+  "filePath": "data/resources/resource_1753898375250_9a1f42b7307de68f.json"
+}

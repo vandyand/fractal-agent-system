@@ -1,0 +1,19 @@
+{
+  "id": "resource_1753898375250_9a1f42b7307de68f",
+  "name": "Company Strategy Document",
+  "type": "document",
+  "content": "Our autonomous digital company strategy focuses on AI-driven business processes and automated revenue generation.",
+  "metadata": {},
+  "agentId": "strategy_planner",
+  "accessLevel": "public",
+  "tags": [
+    "strategy",
+    "business",
+    "planning"
+  ],
+  "version": 1,
+  "createdAt": "2025-07-30T17:59:35.250Z",
+  "updatedAt": "2025-07-30T17:59:35.250Z",
+  "size": 115,
+  "checksum": "edc6b2bd2be0bdee1cb586ab009ff3b85274af7bca7542e7de72a545cb33e583"
+}
