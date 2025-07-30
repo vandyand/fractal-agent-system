@@ -98,7 +98,35 @@ class AgentInterface {
       throw new Error(`Agent ${this.agentId} does not have access to tool ${toolId}`);
     }
 
-    // TODO: Implement tool execution through Tool Registry
+    // For OpenAI JSON Schema tool, execute directly
+    if (toolId === 'openai_json_schema') {
+      try {
+        const { ToolRegistry } = require('../services/tool_registry');
+        const toolRegistry = new ToolRegistry();
+        await toolRegistry.initialize();
+        
+        const result = await toolRegistry.executeTool(toolId, inputData, options);
+        return {
+          success: true,
+          result: result,
+          placeholder: false,
+          agentId: this.agentId,
+          toolId: toolId,
+          timestamp: new Date().toISOString()
+        };
+      } catch (error) {
+        return {
+          success: false,
+          error: error.message,
+          placeholder: false,
+          agentId: this.agentId,
+          toolId: toolId,
+          timestamp: new Date().toISOString()
+        };
+      }
+    }
+
+    // TODO: Implement other tool execution through Tool Registry
     const placeholderMessage = `🚧 PLACEHOLDER TOOL EXECUTION: ${toolId}\n\n` +
       `Agent: ${this.agentId}\n` +
       `Tool: ${toolId}\n` +

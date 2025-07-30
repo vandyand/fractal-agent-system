@@ -179,7 +179,12 @@ class ToolRegistry {
     }
 
     try {
-      // Prepare the request to Node-RED
+      // For OpenAI JSON Schema tool, use the specific API endpoint
+      if (tool.id === 'openai_json_schema') {
+        return await this.executeOpenAIFlow(inputData, options);
+      }
+
+      // For other tools, use the generic flow execution endpoint
       const requestData = {
         flowId: tool.nodeRedFlowId,
         input: inputData,
@@ -234,6 +239,108 @@ class ToolRegistry {
         };
       }
       throw new Error(`Node-RED flow execution failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Execute OpenAI flow via Node-RED API
+   */
+  async executeOpenAIFlow(inputData, options = {}) {
+    try {
+      console.log('🤖 Executing OpenAI API call via Node-RED...');
+      
+      const response = await axios.post(
+        `${this.config.nodeRedUrl}/api/openai/json-schema`,
+        inputData,
+        {
+          timeout: options.timeout || 60000, // Longer timeout for AI calls
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.data.success) {
+        console.log('✅ OpenAI API call successful');
+        return response.data;
+      } else {
+        throw new Error(response.data.error || 'OpenAI API call failed');
+      }
+
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        // Node-RED endpoint not found - try direct OpenAI API call
+        console.log('🔄 Node-RED endpoint not found, trying direct OpenAI API call...');
+        return await this.executeDirectOpenAICall(inputData, options);
+      }
+      throw new Error(`OpenAI flow execution failed: ${error.message}`);
+    }
+  }
+
+  /**
+   * Execute direct OpenAI API call (fallback)
+   */
+  async executeDirectOpenAICall(inputData, options = {}) {
+    try {
+      console.log('🤖 Executing direct OpenAI API call...');
+      
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY environment variable not set');
+      }
+
+      const startTime = Date.now();
+      
+      const response = await axios.post(
+        'https://api.openai.com/v1/chat/completions',
+        {
+          model: inputData.model,
+          response_format: { type: 'json_object' },
+          messages: [
+            {
+              role: 'system',
+              content: `You are a helpful AI assistant that responds with valid JSON according to the provided schema. Always ensure your response is a valid JSON object that matches the schema exactly.`
+            },
+            {
+              role: 'user',
+              content: inputData.prompt
+            }
+          ],
+          temperature: inputData.temperature || 0.7,
+          max_tokens: inputData.maxTokens || 1000
+        },
+        {
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: options.timeout || 60000
+        }
+      );
+
+      const executionTime = Date.now() - startTime;
+      const content = response.data.choices[0].message.content;
+      const usage = response.data.usage || {};
+
+      // Parse the JSON response
+      const parsedData = JSON.parse(content);
+
+      console.log('✅ Direct OpenAI API call successful');
+      
+      return {
+        success: true,
+        data: parsedData,
+        usage: {
+          promptTokens: usage.prompt_tokens || 0,
+          completionTokens: usage.completion_tokens || 0,
+          totalTokens: usage.total_tokens || 0
+        },
+        executionTime: executionTime,
+        timestamp: new Date().toISOString()
+      };
+
+    } catch (error) {
+      console.error('❌ Direct OpenAI API call failed:', error.message);
+      throw new Error(`Direct OpenAI API call failed: ${error.message}`);
     }
   }
 
@@ -434,6 +541,20 @@ class ToolRegistry {
   }
 
   /**
+   * Load Node-RED flow from file
+   */
+  async loadNodeRedFlow(flowName) {
+    try {
+      const flowPath = path.join(__dirname, '../workflows', `${flowName}.json`);
+      const flowData = await fs.readFile(flowPath, 'utf8');
+      return JSON.parse(flowData);
+    } catch (error) {
+      console.warn(`⚠️ Could not load Node-RED flow ${flowName}: ${error.message}`);
+      return null;
+    }
+  }
+
+  /**
    * Save tool to file
    */
   async saveToolToFile(toolId) {
@@ -475,6 +596,7 @@ class ToolRegistry {
         description: 'Execute OpenAI API calls with JSON schema validation',
         category: 'integration',
         nodeRedFlowId: 'openai_json_schema_flow',
+        nodeRedFlow: await this.loadNodeRedFlow('openai_json_schema'),
         inputSchema: {
           type: 'object',
           properties: {

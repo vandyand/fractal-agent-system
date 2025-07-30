@@ -1,0 +1,169 @@
+[
+  {
+    "id": "openai_json_schema_flow",
+    "type": "tab",
+    "label": "OpenAI JSON Schema API",
+    "disabled": false,
+    "info": "Execute OpenAI API calls with JSON schema validation"
+  },
+  {
+    "id": "openai_json_schema_flow_http_in",
+    "type": "http in",
+    "z": "openai_json_schema_flow",
+    "name": "API Endpoint",
+    "url": "/api/openai/json-schema",
+    "method": "POST",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 120,
+    "y": 100,
+    "wires": [
+      [
+        "openai_json_schema_flow_input_validator"
+      ]
+    ]
+  },
+  {
+    "id": "openai_json_schema_flow_input_validator",
+    "type": "function",
+    "z": "openai_json_schema_flow",
+    "name": "Input Validator",
+    "func": "// Validate input parameters\nconst input = msg.payload;\n\n// Check required fields\nif (!input.model) {\n    msg.statusCode = 400;\n    msg.payload = {\n        success: false,\n        error: 'Missing required field: model'\n    };\n    return msg;\n}\n\nif (!input.prompt) {\n    msg.statusCode = 400;\n    msg.payload = {\n        success: false,\n        error: 'Missing required field: prompt'\n    };\n    return msg;\n}\n\nif (!input.schema) {\n    msg.statusCode = 400;\n    msg.payload = {\n        success: false,\n        error: 'Missing required field: schema'\n    };\n    return msg;\n}\n\n// Set defaults\nconst validatedInput = {\n    model: input.model,\n    prompt: input.prompt,\n    schema: input.schema,\n    temperature: input.temperature || 0.7,\n    maxTokens: input.maxTokens || 1000,\n    taskType: input.taskType || 'simple_query'\n};\n\nmsg.validatedInput = validatedInput;\nmsg.payload = validatedInput;\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 320,
+    "y": 100,
+    "wires": [
+      [
+        "openai_json_schema_flow_openai_processor"
+      ]
+    ]
+  },
+  {
+    "id": "openai_json_schema_flow_openai_processor",
+    "type": "function",
+    "z": "openai_json_schema_flow",
+    "name": "OpenAI Processor",
+    "func": "// Process OpenAI API call with JSON schema\nconst input = msg.validatedInput;\nconst startTime = Date.now();\n\n// Prepare the OpenAI API request\nconst openaiRequest = {\n    model: input.model,\n    response_format: { type: 'json_object' },\n    messages: [\n        {\n            role: 'system',\n            content: `You are a helpful AI assistant that responds with valid JSON according to the provided schema. Always ensure your response is a valid JSON object that matches the schema exactly.`\n        },\n        {\n            role: 'user',\n            content: input.prompt\n        }\n    ],\n    temperature: input.temperature,\n    max_tokens: input.maxTokens\n};\n\n// Store request for processing\nmsg.openaiRequest = openaiRequest;\nmsg.startTime = startTime;\nmsg.payload = openaiRequest;\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 520,
+    "y": 100,
+    "wires": [
+      [
+        "openai_json_schema_flow_openai_api_call"
+      ]
+    ]
+  },
+  {
+    "id": "openai_json_schema_flow_openai_api_call",
+    "type": "http request",
+    "z": "openai_json_schema_flow",
+    "name": "OpenAI API Call",
+    "method": "POST",
+    "ret": "obj",
+    "paytoqs": "ignore",
+    "url": "https://api.openai.com/v1/chat/completions",
+    "tls": "",
+    "persist": false,
+    "proxy": "",
+    "authType": "bearer",
+    "senderr": false,
+    "headers": [
+        {
+            "key": "Content-Type",
+            "value": "application/json"
+        },
+        {
+            "key": "Authorization",
+            "value": "Bearer {{env.OPENAI_API_KEY}}"
+        }
+    ],
+    "x": 720,
+    "y": 100,
+    "wires": [
+      [
+        "openai_json_schema_flow_response_processor"
+      ]
+    ]
+  },
+  {
+    "id": "openai_json_schema_flow_response_processor",
+    "type": "function",
+    "z": "openai_json_schema_flow",
+    "name": "Response Processor",
+    "func": "// Process OpenAI API response\nconst response = msg.payload;\nconst startTime = msg.startTime;\nconst executionTime = Date.now() - startTime;\n\nif (response.error) {\n    msg.statusCode = 500;\n    msg.payload = {\n        success: false,\n        error: response.error.message || 'OpenAI API error',\n        executionTime: executionTime,\n        timestamp: new Date().toISOString()\n    };\n    return msg;\n}\n\ntry {\n    // Parse the JSON response\n    const content = response.choices[0].message.content;\n    const parsedData = JSON.parse(content);\n    \n    // Extract usage information\n    const usage = response.usage || {};\n    \n    const result = {\n        success: true,\n        data: parsedData,\n        usage: {\n            promptTokens: usage.prompt_tokens || 0,\n            completionTokens: usage.completion_tokens || 0,\n            totalTokens: usage.total_tokens || 0\n        },\n        executionTime: executionTime,\n        timestamp: new Date().toISOString()\n    };\n    \n    msg.payload = result;\n    return msg;\n    \n} catch (parseError) {\n    msg.statusCode = 500;\n    msg.payload = {\n        success: false,\n        error: 'Failed to parse OpenAI response as JSON',\n        details: parseError.message,\n        rawResponse: response.choices[0].message.content,\n        executionTime: executionTime,\n        timestamp: new Date().toISOString()\n    };\n    return msg;\n}",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 920,
+    "y": 100,
+    "wires": [
+      [
+        "openai_json_schema_flow_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "openai_json_schema_flow_http_response",
+    "type": "http response",
+    "z": "openai_json_schema_flow",
+    "name": "API Response",
+    "statusCode": "200",
+    "headers": [
+        {
+            "key": "Content-Type",
+            "value": "application/json"
+        }
+    ],
+    "x": 1120,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "openai_json_schema_flow_error_handler",
+    "type": "catch",
+    "z": "openai_json_schema_flow",
+    "name": "Error Handler",
+    "scope": [
+        "openai_json_schema_flow_input_validator",
+        "openai_json_schema_flow_openai_processor",
+        "openai_json_schema_flow_response_processor"
+    ],
+    "uncaught": false,
+    "x": 920,
+    "y": 200,
+    "wires": [
+        [
+            "openai_json_schema_flow_error_response"
+        ]
+    ]
+  },
+  {
+    "id": "openai_json_schema_flow_error_response",
+    "type": "function",
+    "z": "openai_json_schema_flow",
+    "name": "Error Response",
+    "func": "// Handle errors and return proper response\nconst error = msg.error;\n\nmsg.statusCode = 500;\nmsg.payload = {\n    success: false,\n    error: error.message || 'Internal server error',\n    details: error.stack,\n    timestamp: new Date().toISOString()\n};\n\nreturn msg;",
+    "outputs": 1,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 1120,
+    "y": 200,
+    "wires": [
+        [
+            "openai_json_schema_flow_http_response"
+        ]
+    ]
+  }
+] 
