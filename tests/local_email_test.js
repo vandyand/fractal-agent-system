@@ -50,7 +50,7 @@ class LocalEmailTest {
           if (tokenError.message.includes("invalid_grant")) {
             console.error("❌ Gmail API token is invalid or has been revoked.");
             console.error("💡 Run the following command to get a new token:");
-            console.error("   node tests/gmail_auth_setup.js\n");
+            console.error("   node tests/gmail_setup.js\n");
             throw new Error("Invalid token - needs re-authentication");
           }
           throw tokenError;
@@ -391,7 +391,7 @@ ${signature}`;
       if (error.message.includes("invalid_grant")) {
         console.error("\n❌ Gmail API token is invalid or has been revoked.");
         console.error("💡 Run the following command to get a new token:");
-        console.error("   node tests/gmail_auth_setup.js\n");
+        console.error("   node tests/gmail_setup.js\n");
       }
     }
   }

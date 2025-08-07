@@ -57,9 +57,9 @@ async function refreshToken() {
     
     // The refresh token is invalid, we need to get a new one
     if (error.message.includes("invalid_grant")) {
-      console.error("\n💡 The refresh token is invalid or has been revoked. You need to get a new token.");
-      console.error("💡 Run the following command to get a new token:");
-      console.error("   node tests/gmail_auth_setup.js\n");
+      console.error("\n💡 The refresh token is invalid or has been revoked. You need to re-authenticate.");
+      console.error("💡 Run the following command to set up Gmail authentication:");
+      console.error("   node tests/gmail_setup.js\n");
       process.exit(1);
     }
   }
