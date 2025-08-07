@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const fs = require("fs");
+const path = require("path");
 const { google } = require("googleapis");
 
 async function refreshToken() {
@@ -9,7 +10,7 @@ async function refreshToken() {
   try {
     // Load credentials
     const credentials = JSON.parse(
-      fs.readFileSync("email_data/credentials.json", "utf8")
+      fs.readFileSync(path.join(__dirname, "../email_data/credentials.json"), "utf8")
     );
     const { client_secret, client_id, redirect_uris } =
       credentials.installed || credentials.web || credentials;
@@ -23,7 +24,7 @@ async function refreshToken() {
 
     // Load current token
     const token = JSON.parse(
-      fs.readFileSync("email_data/token.json", "utf8")
+      fs.readFileSync(path.join(__dirname, "../email_data/token.json"), "utf8")
     );
 
     console.log("📧 Current token expiry:", new Date(token.expiry_date));
@@ -39,11 +40,11 @@ async function refreshToken() {
     // Save the new token
     const newToken = {
       ...token,
-      access_token: newCredentials.access_token,
-      expiry_date: newCredentials.expiry_date
+      access_token: newCredentials.access_token || token.access_token,
+      expiry_date: newCredentials.expiry_date || Date.now() + 3600000
     };
 
-    fs.writeFileSync("email_data/token.json", JSON.stringify(newToken, null, 2));
+    fs.writeFileSync(path.join(__dirname, "../email_data/token.json"), JSON.stringify(newToken, null, 2));
 
     console.log("✅ Token refreshed successfully!");
     console.log("📧 New token expiry:", new Date(newToken.expiry_date));
