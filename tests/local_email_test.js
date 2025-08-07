@@ -33,7 +33,9 @@ class LocalEmailTest {
         client_id,
         client_secret,
         redirect_uris[0]
-      );
+      );      
+      // Initialize Gmail API client first
+      this.gmail = google.gmail({ version: "v1", auth: this.oAuth2Client });
 
       // Load token
       if (fs.existsSync("email_data/token.json")) {
@@ -58,8 +60,6 @@ class LocalEmailTest {
       } else {
         throw new Error("Gmail API token not found");
       }
-
-      this.gmail = google.gmail({ version: "v1", auth: this.oAuth2Client });
 
       // Setup nodemailer
       this.transporter = nodemailer.createTransport({
