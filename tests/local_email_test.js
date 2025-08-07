@@ -41,7 +41,20 @@ class LocalEmailTest {
           fs.readFileSync("email_data/token.json", "utf8")
         );
         this.oAuth2Client.setCredentials(token);
-        console.log("✅ Gmail API token loaded");
+      
+        // Verify token is valid by making a simple API call
+        try {
+          await this.gmail.users.getProfile({ userId: "me" });
+          console.log("✅ Gmail API token loaded and verified");
+        } catch (tokenError) {
+          if (tokenError.message.includes("invalid_grant")) {
+            console.error("❌ Gmail API token is invalid or has been revoked.");
+            console.error("💡 Run the following command to get a new token:");
+            console.error("   node tests/gmail_auth_setup.js\n");
+            throw new Error("Invalid token - needs re-authentication");
+          }
+          throw tokenError;
+        }
       } else {
         throw new Error("Gmail API token not found");
       }
@@ -373,6 +386,13 @@ ${signature}`;
       }
     } catch (error) {
       console.error("❌ Error checking emails:", error.message);
+      
+      // Handle invalid token errors specifically
+      if (error.message.includes("invalid_grant")) {
+        console.error("\n❌ Gmail API token is invalid or has been revoked.");
+        console.error("💡 Run the following command to get a new token:");
+        console.error("   node tests/gmail_auth_setup.js\n");
+      }
     }
   }
 
