@@ -186,7 +186,7 @@ Best regards,
     this.gmail = google.gmail({ version: "v1", auth: this.oAuth2Client });
 
     // Setup nodemailer transporter
-    this.transporter = nodemailer.createTransporter({
+    this.transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
         type: "OAuth2",

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-const { SimpleTaskManager } = require("./simple_task_manager");
+const { SimpleTaskManager } = require("../services/simple_task_manager");
 const { EnhancedAgentCommunication } = require("./enhanced_agent_communication");
-const FractalAgentCLI = require("./fractal_agent_cli");
+const FractalAgentCLI = require("../agents/fractal_agent_cli");
 const fs = require("fs");
 const path = require("path");
 

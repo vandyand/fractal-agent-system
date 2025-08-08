@@ -18,7 +18,7 @@
     "protocol": "node src/index.js protocol",
     "test": "node tests/test_runner.js",
     "reality": "node src/utils/reality_check.js",
-    "enhanced": "node src/utils/enhanced_agent_runner.js",
+    
     "capture": "node src/utils/capture_real_outputs.js",
     "example": "node src/utils/example_usage.js",
     "fractal": "node src/utils/fractal_system_entry.js",
@@ -39,7 +39,9 @@
     "system:stop": "./scripts/deployment/start_system.sh stop",
     "system:status": "./scripts/deployment/start_system.sh status",
     "system:restart": "./scripts/deployment/start_system.sh restart",
-    "quick:start": "./scripts/deployment/quick_start.sh"
+    "quick:start": "./scripts/deployment/quick_start.sh",
+    "email:test:local": "node tests/local_email_test.js",
+    "email:setup": "node tests/gmail_setup.js"
   },
   "keywords": [
     "node-red",

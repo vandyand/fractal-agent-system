@@ -202,3 +202,4 @@ Thumbs.db
 *.old
 .aider*
 .specstory/*
+nohup.out
