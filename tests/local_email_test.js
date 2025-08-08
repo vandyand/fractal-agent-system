@@ -258,11 +258,11 @@ Respond with a JSON object containing:
   async generateResponseWithAI(email, categorization) {
     console.log("🤖 Generating AI response...");
 
-    const prompt = `You are a friendly, professional email responder for PragmaGen Systems, a cool San Francisco tech startup. 
-    
+    const prompt = `You are a friendly, professional email responder for PragmaGen Systems, a cool San Francisco tech startup.
+
 Your personality should be:
 - Professional but warm and human
-- Tech-savvy but approachable  
+- Tech-savvy but approachable
 - Enthusiastic about helping people
 - Slightly whimsical and creative
 - Confident but not arrogant
@@ -276,6 +276,14 @@ Category: ${categorization.category}
 Priority: ${categorization.priority}
 Reasoning: ${categorization.reasoning}
 
+STRICT OUTPUT RULES:
+1) Do NOT include any sign-off or signature, or closing phrases (e.g., "Best regards", "Sincerely", names, titles, phone, website) in 'greeting', 'body', or 'next_steps'.
+2) Provide the company signature ONLY in the 'signature' field, and it must be EXACTLY:
+Best regards,\nPragmaGen Systems\nCustomer Success Team\nwww.pragmagen.com
+3) 'greeting' should be a single-line greeting only.
+4) 'body' must contain only the main message content; no sign-offs.
+5) 'next_steps' should contain only actionable next steps; no sign-offs.
+
 Generate a custom email response that:
 1. Acknowledges their message warmly
 2. Addresses their specific inquiry or comment
@@ -286,9 +294,9 @@ Generate a custom email response that:
 Respond with a JSON object containing:
 - subject: Custom subject line (can be creative but professional)
 - greeting: Personalized greeting
-- body: Main email body with personality
-- signature: Professional but friendly signature
-- next_steps: What happens next
+- body: Main email body with personality (NO sign-offs)
+- signature: EXACTLY the company signature specified above
+- next_steps: What happens next (NO sign-offs)
 - urgency_level: "immediate", "soon", or "standard" based on priority`;
 
     try {
@@ -318,14 +326,19 @@ Respond with a JSON object containing:
       // Create the full email
       const ticketId = `${categorization.category.toUpperCase()}-${Date.now()}`;
       const customerName = email.from.split("@")[0];
+      const standardSignature = this.getStandardSignature();
+
+      // Sanitize body and next_steps to strip any accidental sign-offs
+      const cleanBody = this.removeSignOffs(result.body || "");
+      const cleanNextSteps = this.removeSignOffs(result.next_steps || "");
 
       const emailBody = `${result.greeting}
 
-${result.body}
+${cleanBody}
 
-${result.next_steps}
+${cleanNextSteps}
 
-${result.signature}
+${standardSignature}
 
 ---
 Ticket ID: ${ticketId} | Priority: ${categorization.priority} | Urgency: ${result.urgency_level}`;
@@ -352,7 +365,7 @@ Ticket ID: ${ticketId} | Priority: ${categorization.priority} | Urgency: ${resul
     const customerName = email.from.split("@")[0];
     const ticketId = `${categorization.category.toUpperCase()}-${Date.now()}`;
 
-    let subject, body, signature;
+    let subject, body;
 
     switch (categorization.category) {
       case "support":
@@ -362,8 +375,7 @@ Ticket ID: ${ticketId} | Priority: ${categorization.priority} | Urgency: ${resul
 Thanks for reaching out about "${email.subject}" - we love hearing from our users and we're here to help!
 
 I've got your back on this one. Our support team is already taking a look and we'll get you sorted out pronto.`;
-        signature = `Cheers,
-The PragmaGen Crew 🎉`;
+        
         break;
 
       case "sales":
@@ -373,8 +385,7 @@ The PragmaGen Crew 🎉`;
 Thanks for your interest in what we're building! We're stoked you reached out about "${email.subject}".
 
 Our sales team is pumped to chat with you and see how we can help bring your vision to life.`;
-        signature = `Can't wait to connect!
-The PragmaGen Team 🚀`;
+        
         break;
 
       case "technical":
@@ -384,8 +395,7 @@ The PragmaGen Team 🚀`;
 Thanks for the heads up about "${email.subject}" - our engineering team loves diving into technical challenges like this!
 
 We're already investigating and we'll get back to you with some solid solutions.`;
-        signature = `Happy coding!
-The PragmaGen Dev Team 🛠️`;
+        
         break;
 
       case "urgent":
@@ -395,8 +405,7 @@ The PragmaGen Dev Team 🛠️`;
 We got your urgent message about "${email.subject}" and we're treating this as top priority!
 
 Our senior team is already mobilized and we'll be in touch within the hour.`;
-        signature = `We've got your back!
-The PragmaGen Emergency Response Team 🚨`;
+        
         break;
 
       default:
@@ -406,15 +415,16 @@ The PragmaGen Emergency Response Team 🚨`;
 Thanks for your message about "${email.subject}" - we appreciate you taking the time to connect with us!
 
 We're looking into this and will get back to you soon with some good news.`;
-        signature = `Stay awesome!
-The PragmaGen Team ✨`;
+        
     }
+
+    const standardSignature = this.getStandardSignature();
 
     const emailBody = `${body}
 
 Ticket ID: ${ticketId} | Priority: ${categorization.priority}
 
-${signature}`;
+${standardSignature}`;
 
     return {
       to: email.from,
@@ -422,6 +432,40 @@ ${signature}`;
       text: emailBody,
       html: emailBody.replace(/\n/g, "<br>"),
     };
+  }
+
+  getStandardSignature() {
+    return `Best regards,
+PragmaGen Systems
+Customer Success Team
+www.pragmagen.com`;
+  }
+
+  // Remove common sign-offs/signatures from generated text defensively
+  removeSignOffs(text) {
+    if (!text) return text;
+    const lines = text.split(/\r?\n/);
+    const signoffPatterns = [
+      /^(best|best regards|regards|thanks|thank you|sincerely|cheers|kind regards)[,\s]*$/i,
+      /^--+\s*$/, // signature delimiter
+      /^(?:thanks|thank you)[,\s]*[\-–—]?\s*$/i,
+    ];
+
+    // Trim trailing lines that look like sign-offs or empty
+    while (lines.length > 0) {
+      const last = lines[lines.length - 1].trim();
+      if (!last) {
+        lines.pop();
+        continue;
+      }
+      if (signoffPatterns.some((re) => re.test(last))) {
+        lines.pop();
+        continue;
+      }
+      break;
+    }
+
+    return lines.join("\n");
   }
 
   async checkForNewEmails() {
