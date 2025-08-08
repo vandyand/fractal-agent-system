@@ -6,7 +6,7 @@ const path = require("path");
 
 class FractalAgentCLI {
   constructor() {
-    this.nodeRedUrl = "http://localhost:1880";
+    this.nodeRedUrl = process.env.NODE_RED_URL || "http://localhost:1880";
     this.deployedAgents = new Map();
     this.spawnHistory = [];
   }
@@ -21,10 +21,15 @@ class FractalAgentCLI {
       await axios.get(`${this.nodeRedUrl}/flows`);
       console.log("✅ Node-RED is running and accessible");
     } catch (error) {
-      console.error(
-        "❌ Node-RED is not accessible. Please start Node-RED first."
-      );
-      process.exit(1);
+      if (process.env.ALLOW_OFFLINE === "true") {
+        console.warn(
+          "⚠️ Node-RED is not accessible, but ALLOW_OFFLINE=true - continuing in offline mode"
+        );
+      } else {
+        throw new Error(
+          `Node-RED not accessible at ${this.nodeRedUrl}. Start Node-RED or set NODE_RED_URL`
+        );
+      }
     }
   }
 
@@ -498,19 +503,13 @@ return msg;`,
     console.log(`📦 Deploying workflow: ${workflowName}`);
 
     try {
-      // Get current flows first
-      const currentFlowsResponse = await axios.get(`${this.nodeRedUrl}/flows`);
-      const currentFlows = currentFlowsResponse.data || [];
+      // Load current flows
+      const { NodeRedClient } = require('../services/node_red_client');
+      const client = new NodeRedClient(this.nodeRedUrl);
+      await client.ensureAvailable();
+      const response = await client.deployFlowSet(workflow);
 
-      // Add new workflow to existing flows
-      const updatedFlows = [...currentFlows, ...workflow];
-
-      const response = await axios.post(
-        `${this.nodeRedUrl}/flows`,
-        updatedFlows
-      );
-
-      if (response.status === 200 || response.status === 204) {
+      if (response && (response.status === 200 || response.status === 204)) {
         console.log(`✅ Workflow deployed successfully: ${workflowName}`);
         return {
           success: true,
@@ -519,7 +518,7 @@ return msg;`,
           timestamp: new Date().toISOString(),
         };
       } else {
-        throw new Error(`Deployment failed with status: ${response.status}`);
+        throw new Error(`Deployment failed with status: ${response?.status}`);
       }
     } catch (error) {
       console.error(`❌ Workflow deployment failed: ${error.message}`);

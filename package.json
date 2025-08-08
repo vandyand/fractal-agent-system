@@ -41,7 +41,9 @@
     "system:restart": "./scripts/deployment/start_system.sh restart",
     "quick:start": "./scripts/deployment/quick_start.sh",
     "email:test:local": "node tests/local_email_test.js",
-    "email:setup": "node tests/gmail_setup.js"
+    "email:setup": "node tests/gmail_setup.js",
+    "flows:deploy": "node src/utils/test_flows_deploy.js",
+    "flows:deploy:all": "node src/utils/deploy_all_flows.js"
   },
   "keywords": [
     "node-red",
