@@ -41,7 +41,12 @@
         },
         "schema": {
           "type": "object",
-          "description": "JSON schema for structured output"
+          "description": "JSON schema for structured output (optional for web search)"
+        },
+        "enableWebSearch": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable web search for up-to-date information"
         },
         "temperature": {
           "type": "number",
@@ -64,7 +69,7 @@
           "description": "Type of task to optimize token usage"
         }
       },
-      "required": ["model", "prompt", "schema"]
+      "required": ["model", "prompt"]
     },
     "openAIResponse": {
       "type": "object",
@@ -98,10 +103,22 @@
             }
           }
         },
+        "executionTime": {
+          "type": "integer",
+          "description": "Execution time in milliseconds"
+        },
         "timestamp": {
           "type": "string",
           "format": "date-time",
           "description": "Timestamp of the response"
+        },
+        "webSearchEnabled": {
+          "type": "boolean",
+          "description": "Whether web search was enabled for this request"
+        },
+        "webSources": {
+          "type": "integer",
+          "description": "Number of web sources found and referenced"
         }
       },
       "required": ["success", "timestamp"]

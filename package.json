@@ -29,6 +29,7 @@
     "test:agents": "node src/utils/test_agent_system.js",
     "test:integrated": "node src/utils/test_integrated_system.js",
     "test:openai": "node src/utils/test_openai_integration.js",
+    "test:web-search": "node src/utils/test_web_search.js",
     "node-red": "node-red --port 1880",
     "nodered:start": "./scripts/deployment/start_node_red.sh start",
     "nodered:stop": "./scripts/deployment/stop_node_red.sh",

@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
+const readline = require("readline");
 
 /**
  * Local Email Test System
@@ -16,6 +17,7 @@ class LocalEmailTest {
     this.transporter = null;
     this.processedLabelId = "Label_1"; // From our label setup
     this.openaiApiKey = process.env.OPENAI_API_KEY;
+    this.dataDir = "email_data";
   }
 
   async init() {
@@ -38,30 +40,44 @@ class LocalEmailTest {
       this.gmail = google.gmail({ version: "v1", auth: this.oAuth2Client });
 
       // Load token
-      if (fs.existsSync("email_data/token.json")) {
+      if (fs.existsSync(path.join(this.dataDir, "token.json"))) {
         const token = JSON.parse(
-          fs.readFileSync("email_data/token.json", "utf8")
+          fs.readFileSync(path.join(this.dataDir, "token.json"), "utf8")
         );
         this.oAuth2Client.setCredentials(token);
-      
+
         // Verify token is valid by making a simple API call
         try {
           await this.gmail.users.getProfile({ userId: "me" });
           console.log("✅ Gmail API token loaded and verified");
         } catch (tokenError) {
-          if (tokenError.message.includes("invalid_grant")) {
+          // Attempt interactive re-auth on invalid_grant or 401/400
+          const needsReauth =
+            (tokenError && typeof tokenError.message === "string" &&
+              tokenError.message.includes("invalid_grant")) ||
+            tokenError?.code === 401 ||
+            tokenError?.code === 400;
+
+          if (needsReauth) {
             console.error("\n❌ Gmail API token is invalid or has been revoked.");
-            console.error("💡 Run the following command to get a new token:");
-            console.error("   node tests/gmail_setup.js\n");
-            throw new Error("Invalid token - needs re-authentication");
+            console.error("🔑 Starting interactive re-authentication to obtain a new token...\n");
+            await this.getNewTokenInteractive({ client_id, client_secret, redirect_uri: redirect_uris[0] });
+
+            // Retry verification after reauth
+            await this.gmail.users.getProfile({ userId: "me" });
+            console.log("✅ Gmail API token re-authenticated and verified");
+          } else {
+            throw tokenError;
           }
-          throw tokenError;
         }
       } else {
         console.error("\n❌ Gmail API token not found");
-        console.error("💡 Run the following command to set up Gmail authentication:");
-        console.error("   node tests/gmail_setup.js\n");
-        throw new Error("Gmail API token not found");
+        console.error("🔑 Starting interactive authentication to create one now...\n");
+        await this.getNewTokenInteractive({ client_id, client_secret, redirect_uri: redirect_uris[0] });
+
+        // Verify post-auth
+        await this.gmail.users.getProfile({ userId: "me" });
+        console.log("✅ Gmail API token created and verified");
       }
 
       // Setup nodemailer
@@ -82,6 +98,49 @@ class LocalEmailTest {
       console.error("❌ Failed to initialize:", error.message);
       throw error;
     }
+  }
+
+  async getNewTokenInteractive({ client_id, client_secret, redirect_uri }) {
+    // Prepare OAuth2 client if not present
+    if (!this.oAuth2Client) {
+      this.oAuth2Client = new google.auth.OAuth2(
+        client_id,
+        client_secret,
+        redirect_uri
+      );
+    }
+
+    const authUrl = this.oAuth2Client.generateAuthUrl({
+      access_type: "offline",
+      prompt: "consent",
+      scope: [
+        "https://mail.google.com/",
+        "https://www.googleapis.com/auth/gmail.send",
+        "https://www.googleapis.com/auth/gmail.readonly",
+      ],
+    });
+
+    console.log("🔗 Please visit this URL to authorize the application:");
+    console.log(authUrl);
+
+    const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+    const question = (q) => new Promise((resolve) => rl.question(q, resolve));
+
+    const code = await question("\n🔑 Enter the authorization code: ");
+    rl.close();
+
+    const { tokens } = await this.oAuth2Client.getToken(code.trim());
+    this.oAuth2Client.setCredentials(tokens);
+
+    // Persist token
+    if (!fs.existsSync(this.dataDir)) {
+      fs.mkdirSync(this.dataDir, { recursive: true });
+    }
+    fs.writeFileSync(
+      path.join(this.dataDir, "token.json"),
+      JSON.stringify(tokens, null, 2)
+    );
+    console.log("✅ New token saved to email_data/token.json");
   }
 
   async categorizeEmailWithAI(email) {
@@ -421,8 +480,8 @@ ${signature}`;
         categorization
       );
 
-      // Send response
-      await this.sendEmail(responseEmail);
+      // Send a threaded reply instead of a new email
+      await this.sendReplyEmail(email, responseEmail);
 
       // Mark as processed
       await this.markEmailAsProcessed(messageId);
@@ -439,10 +498,16 @@ ${signature}`;
 
     return {
       id: message.id,
+      threadId: message.threadId,
       from: this.getHeader(headers, "From"),
       to: this.getHeader(headers, "To"),
       subject: this.getHeader(headers, "Subject"),
       date: this.getHeader(headers, "Date"),
+      messageIdHeader:
+        this.getHeader(headers, "Message-ID") ||
+        this.getHeader(headers, "Message-Id") ||
+        this.getHeader(headers, "MessageId") ||
+        "",
       body: body,
       snippet: message.snippet,
     };
@@ -512,6 +577,71 @@ ${emailData.html}`;
       }
       throw error;
     }
+  }
+
+  // Send a reply in the same thread, with proper headers
+  async sendReplyEmail(originalEmail, responseEmail) {
+    try {
+      console.log("📤 Sending threaded reply via Gmail API...");
+
+      // Ensure subject starts with Re:
+      const subject = responseEmail.subject && responseEmail.subject.trim().toLowerCase().startsWith("re:")
+        ? responseEmail.subject
+        : `Re: ${originalEmail.subject || responseEmail.subject}`;
+
+      const toAddress = this.extractEmailAddress(originalEmail.from) || originalEmail.from;
+
+      // Build RFC 2822 message with In-Reply-To and References
+      const headers = [
+        `From: pragmagen@gmail.com`,
+        `To: ${toAddress}`,
+        `Subject: ${subject}`,
+        `Content-Type: text/html; charset=utf-8`,
+      ];
+
+      if (originalEmail.messageIdHeader) {
+        headers.push(`In-Reply-To: ${originalEmail.messageIdHeader}`);
+        headers.push(`References: ${originalEmail.messageIdHeader}`);
+      }
+
+      const emailContent = `${headers.join("\n")}\n\n${responseEmail.html}`;
+
+      // Encode the email in base64url
+      const encodedEmail = Buffer.from(emailContent)
+        .toString("base64")
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      // Send email via Gmail API with threadId to ensure threading
+      const result = await this.gmail.users.messages.send({
+        userId: "me",
+        requestBody: {
+          raw: encodedEmail,
+          threadId: originalEmail.threadId,
+        },
+      });
+
+      console.log(`✅ Reply sent successfully via Gmail API: ${result.data.id}`);
+      return result.data;
+    } catch (error) {
+      console.error("❌ Failed to send threaded reply via Gmail API:");
+      console.error("   Error message:", error.message);
+      console.error("   Error code:", error.code);
+      if (error.response) {
+        console.error("   Response data:", error.response.data);
+      }
+      throw error;
+    }
+  }
+
+  extractEmailAddress(fromHeader) {
+    if (!fromHeader) return "";
+    const match = fromHeader.match(/<([^>]+)>/);
+    if (match) return match[1];
+    // If no angle brackets, return the header itself if it looks like an email
+    if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fromHeader.trim())) return fromHeader.trim();
+    return fromHeader;
   }
 
   async markEmailAsProcessed(messageId) {

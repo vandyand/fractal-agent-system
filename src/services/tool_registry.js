@@ -245,7 +245,7 @@ class ToolRegistry {
 
 
   /**
-   * Execute direct OpenAI API call
+   * Execute direct OpenAI API call with optional web search
    */
   async executeDirectOpenAICall(inputData, options = {}) {
     try {
@@ -262,6 +262,13 @@ class ToolRegistry {
         console.log(`🔄 Using cost-effective model: ${model}`);
       }
 
+      // Check if web search is requested
+      const enableWebSearch = inputData.enableWebSearch || false;
+      if (enableWebSearch && model === 'gpt-4.1-nano') {
+        console.log('⚠️ Web search not supported on gpt-4.1-nano, upgrading to gpt-4.1-mini');
+        model = 'gpt-4.1-mini';
+      }
+
       // Optimize token usage based on task type
       let maxTokens = inputData.maxTokens || 1000;
       if (inputData.taskType === 'simple_query') {
@@ -274,24 +281,37 @@ class ToolRegistry {
 
       const startTime = Date.now();
       
+      // Prepare request payload
+      const requestPayload = {
+        model: model,
+        messages: [
+          {
+            role: 'system',
+            content: `You are a helpful AI assistant that provides accurate, up-to-date information. ${inputData.schema ? 'Always ensure your response is a valid JSON object that matches the provided schema exactly.' : 'Be concise and efficient in your responses.'}`
+          },
+          {
+            role: 'user',
+            content: inputData.prompt
+          }
+        ],
+        temperature: inputData.temperature || 0.7,
+        max_tokens: maxTokens
+      };
+
+      // Add JSON response format if schema is provided
+      if (inputData.schema) {
+        requestPayload.response_format = { type: 'json_object' };
+      }
+
+      // Add web search tool if enabled
+      if (enableWebSearch) {
+        requestPayload.tools = [{ type: 'web_search_preview' }];
+        console.log('🌐 Web search enabled for this request');
+      }
+      
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
-        {
-          model: model,
-          response_format: { type: 'json_object' },
-          messages: [
-            {
-              role: 'system',
-              content: `You are a helpful AI assistant that responds with valid JSON according to the provided schema. Always ensure your response is a valid JSON object that matches the schema exactly. Be concise and efficient in your responses.`
-            },
-            {
-              role: 'user',
-              content: inputData.prompt
-            }
-          ],
-          temperature: inputData.temperature || 0.7,
-          max_tokens: maxTokens
-        },
+        requestPayload,
         {
           headers: {
             'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
@@ -305,8 +325,24 @@ class ToolRegistry {
       const content = response.data.choices[0].message.content;
       const usage = response.data.usage || {};
 
-      // Parse the JSON response
-      const parsedData = JSON.parse(content);
+      // Parse the response
+      let parsedData;
+      if (inputData.schema) {
+        parsedData = JSON.parse(content);
+      } else {
+        parsedData = { response: content };
+      }
+
+      // Extract web search annotations if present
+      const annotations = response.data.choices[0].message.annotations || [];
+      if (annotations.length > 0) {
+        parsedData.webSources = annotations.map(annotation => ({
+          url: annotation.url,
+          title: annotation.title,
+          position: annotation.position
+        }));
+        console.log(`📚 Web search found ${annotations.length} sources`);
+      }
 
       console.log('✅ Direct OpenAI API call successful');
       
@@ -319,11 +355,17 @@ class ToolRegistry {
           totalTokens: usage.total_tokens || 0
         },
         executionTime: executionTime,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        webSearchEnabled: enableWebSearch,
+        webSources: annotations.length > 0 ? annotations.length : 0
       };
 
     } catch (error) {
       console.error('❌ Direct OpenAI API call failed:', error.message);
+      if (error.response) {
+        console.error('Response status:', error.response.status);
+        console.error('Response data:', JSON.stringify(error.response.data, null, 2));
+      }
       throw new Error(`Direct OpenAI API call failed: ${error.message}`);
     }
   }
