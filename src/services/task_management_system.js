@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const FractalAgentCLI = require("../agents/fractal_agent_cli");
+const { ToolRegistry } = require("./tool_registry");
 const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
@@ -9,6 +10,7 @@ class TaskManagementSystem extends EventEmitter {
   constructor() {
     super();
     this.cli = new FractalAgentCLI();
+    this.toolRegistry = new ToolRegistry({ nodeRedUrl: process.env.NODE_RED_URL || 'http://localhost:1880' });
     this.tasks = new Map();
     this.workflows = new Map();
     this.taskQueue = [];
@@ -414,6 +416,9 @@ class TaskManagementSystem extends EventEmitter {
     await this.cli.init();
     this.cli.loadState();
 
+    // Initialize Tool Registry for direct tool-backed execution when needed
+    await this.toolRegistry.initialize();
+
     // Load existing tasks and workflows
     this.loadTaskData();
 
@@ -682,20 +687,103 @@ class TaskManagementSystem extends EventEmitter {
     };
 
     // Execute the agent with the step data
-    const result = await this.cli.runAgent(agentId, {
-      action: step.action,
-      input: stepInput,
-      timestamp: new Date().toISOString(),
-    });
+    try {
+      const result = await this.cli.runAgent(agentId, {
+        action: step.action,
+        input: stepInput,
+        timestamp: new Date().toISOString(),
+      });
 
+      return {
+        success: true,
+        agentId,
+        action: step.action,
+        result,
+        executionTime: Date.now(),
+        timestamp: new Date().toISOString(),
+      };
+    } catch (err) {
+      console.warn(`⚠️ Node-RED agent execution failed (${err.message || 'unknown'}). Falling back to Tool Registry.`);
+      return await this.executeStepViaTools(task, step, agentId, stepInput);
+    }
+  }
+
+  // Fallback execution path using Tool Registry (real OpenAI, no placeholders)
+  async executeStepViaTools(task, step, agentId, stepInput) {
+    const { prompt, schema } = this.buildOpenAIRequestForStep(step, task, stepInput);
+    const input = {
+      model: 'gpt-4.1-mini',
+      prompt,
+      schema,
+      temperature: 0.2,
+      maxTokens: 600,
+      taskType: 'analysis'
+    };
+
+    const exec = await this.toolRegistry.executeTool('openai_json_schema', input, { timeout: 60000 });
     return {
       success: true,
       agentId,
       action: step.action,
-      result,
+      result: exec,
       executionTime: Date.now(),
       timestamp: new Date().toISOString(),
     };
+  }
+
+  buildOpenAIRequestForStep(step, task, stepInput) {
+    // Simple, deterministic JSON schemas for each step output
+    switch (step.action) {
+      case 'research_topic':
+        return {
+          prompt: `Research the topic: "${task.inputData.topic}" for audience: ${task.inputData.targetAudience}. Return JSON with key findings and sources (titles and URLs).` ,
+          schema: {
+            type: 'object',
+            properties: {
+              keyFindings: { type: 'array', items: { type: 'string' } },
+              sources: { type: 'array', items: { type: 'object', properties: { title: { type: 'string' }, url: { type: 'string' } }, required: ['title','url'] } }
+            },
+            required: ['keyFindings','sources']
+          }
+        };
+      case 'create_outline':
+        return {
+          prompt: `Create an outline for a ${task.inputData.contentType} on "${task.inputData.topic}". Return sections with titles and bullet points.` ,
+          schema: {
+            type: 'object',
+            properties: {
+              sections: { type: 'array', items: { type: 'object', properties: { title: { type: 'string' }, bullets: { type: 'array', items: { type: 'string' } } }, required: ['title','bullets'] } }
+            },
+            required: ['sections']
+          }
+        };
+      case 'write_content':
+        return {
+          prompt: `Write ${task.inputData.wordCount || 300} words ${task.inputData.contentType} for topic "${task.inputData.topic}" in ${task.inputData.tone || 'professional'} tone, based on outline if provided. Return JSON with content string.` ,
+          schema: {
+            type: 'object',
+            properties: { content: { type: 'string' } },
+            required: ['content']
+          }
+        };
+      case 'review_content':
+        return {
+          prompt: `Review the provided content for clarity, correctness, and style. Provide a JSON with score (0-100) and suggestions array.` ,
+          schema: {
+            type: 'object',
+            properties: {
+              score: { type: 'number' },
+              suggestions: { type: 'array', items: { type: 'string' } }
+            },
+            required: ['score','suggestions']
+          }
+        };
+      default:
+        return {
+          prompt: `Perform step "${step.action}" for workflow "${task.workflowType}" and return a JSON result appropriate to the step.`,
+          schema: { type: 'object' }
+        };
+    }
   }
 
   // Deploy Node-RED flow

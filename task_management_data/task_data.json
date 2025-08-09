@@ -342,14 +342,581 @@
           ]
         }
       }
+    ],
+    [
+      "task_1754772453395_m5urz7com",
+      {
+        "id": "task_1754772453395_m5urz7com",
+        "workflowType": "content_creation",
+        "name": "Content Creation Workflow",
+        "description": "Complete content production pipeline",
+        "status": "completed",
+        "priority": "low",
+        "inputData": {
+          "topic": "Test Topic",
+          "targetAudience": "developers",
+          "contentType": "blog_post",
+          "wordCount": 200,
+          "tone": "technical"
+        },
+        "metadata": {
+          "createdAt": "2025-08-09T20:47:33.395Z",
+          "createdBy": "test",
+          "estimatedDuration": "unknown"
+        },
+        "workflow": {
+          "template": {
+            "name": "Content Creation Workflow",
+            "description": "Complete content production pipeline",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Content topic"
+                },
+                "targetAudience": {
+                  "type": "string",
+                  "description": "Target audience"
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "blog_post",
+                    "social_media",
+                    "email",
+                    "video_script"
+                  ]
+                },
+                "wordCount": {
+                  "type": "number",
+                  "description": "Target word count"
+                },
+                "tone": {
+                  "type": "string",
+                  "enum": [
+                    "professional",
+                    "casual",
+                    "technical",
+                    "conversational"
+                  ]
+                }
+              },
+              "required": [
+                "topic",
+                "targetAudience",
+                "contentType"
+              ]
+            },
+            "nodeRedFlow": {
+              "id": "content_creation_workflow",
+              "label": "Content Creation Workflow",
+              "nodes": [
+                {
+                  "id": "research_node",
+                  "type": "openai-function",
+                  "name": "Research Topic",
+                  "config": {
+                    "function": "research_topic",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "topic": {
+                          "type": "string"
+                        },
+                        "researchDepth": {
+                          "type": "string",
+                          "enum": [
+                            "basic",
+                            "comprehensive",
+                            "expert"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "outline_node",
+                  "type": "openai-function",
+                  "name": "Create Outline",
+                  "config": {
+                    "function": "create_outline",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "researchData": {
+                          "type": "object"
+                        },
+                        "structure": {
+                          "type": "string",
+                          "enum": [
+                            "chronological",
+                            "problem_solution",
+                            "list",
+                            "story"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "writing_node",
+                  "type": "openai-function",
+                  "name": "Write Content",
+                  "config": {
+                    "function": "write_content",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "outline": {
+                          "type": "object"
+                        },
+                        "tone": {
+                          "type": "string"
+                        },
+                        "wordCount": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "review_node",
+                  "type": "openai-function",
+                  "name": "Review Content",
+                  "config": {
+                    "function": "review_content",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string"
+                        },
+                        "criteria": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "connections": [
+                {
+                  "from": "research_node",
+                  "to": "outline_node"
+                },
+                {
+                  "from": "outline_node",
+                  "to": "writing_node"
+                },
+                {
+                  "from": "writing_node",
+                  "to": "review_node"
+                }
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "agent_type": "research_agent",
+                "action": "research_topic",
+                "nodeId": "research_node"
+              },
+              {
+                "step": 2,
+                "agent_type": "outline_agent",
+                "action": "create_outline",
+                "nodeId": "outline_node"
+              },
+              {
+                "step": 3,
+                "agent_type": "writing_agent",
+                "action": "write_content",
+                "nodeId": "writing_node"
+              },
+              {
+                "step": 4,
+                "agent_type": "review_agent",
+                "action": "review_content",
+                "nodeId": "review_node"
+              }
+            ]
+          },
+          "currentStep": 4,
+          "totalSteps": 4,
+          "results": {
+            "1": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "action": "research_topic",
+              "result": {
+                "success": true,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+                "action": "research_topic",
+                "result": {
+                  "success": true,
+                  "toolId": "openai_json_schema",
+                  "toolName": "OpenAI JSON Schema API",
+                  "executionId": "exec_1754772453407_a2arvvk4j",
+                  "result": {
+                    "success": true,
+                    "data": {
+                      "key_findings": [
+                        "Test Topic is a concept used to evaluate the effectiveness and reliability of software components.",
+                        "It involves creating and running various test cases to ensure code quality and functionality.",
+                        "Automated testing frameworks are commonly employed to streamline the testing process for developers.",
+                        "Understanding Test Topic helps developers identify bugs early and improve overall software maintainability."
+                      ],
+                      "sources": [
+                        {
+                          "title": "Introduction to Software Testing",
+                          "url": "https://www.softwaretestinghelp.com/introduction-to-software-testing/"
+                        },
+                        {
+                          "title": "Automated Testing Best Practices",
+                          "url": "https://www.atlassian.com/continuous-delivery/automated-testing"
+                        },
+                        {
+                          "title": "The Importance of Testing in Software Development",
+                          "url": "https://www.geeksforgeeks.org/software-testing-introduction/"
+                        }
+                      ]
+                    },
+                    "usage": {
+                      "promptTokens": 67,
+                      "completionTokens": 192,
+                      "totalTokens": 259
+                    },
+                    "executionTime": 3085,
+                    "timestamp": "2025-08-09T20:47:36.684Z",
+                    "webSearchEnabled": false,
+                    "webSources": 0
+                  },
+                  "executionTime": 3277,
+                  "timestamp": "2025-08-09T20:47:36.684Z"
+                },
+                "executionTime": 1754772456684,
+                "timestamp": "2025-08-09T20:47:36.684Z"
+              },
+              "timestamp": "2025-08-09T20:47:36.684Z"
+            },
+            "2": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "action": "create_outline",
+              "result": {
+                "success": true,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+                "action": "create_outline",
+                "result": {
+                  "success": true,
+                  "toolId": "openai_json_schema",
+                  "toolName": "OpenAI JSON Schema API",
+                  "executionId": "exec_1754772456687_rvv9szu23",
+                  "result": {
+                    "success": true,
+                    "data": {
+                      "sections": [
+                        {
+                          "title": "Introduction to Test Topic",
+                          "bullet_points": [
+                            "Definition and overview of Test Topic",
+                            "Importance and relevance in current context",
+                            "Purpose and scope of the blog post"
+                          ]
+                        },
+                        {
+                          "title": "Background and History",
+                          "bullet_points": [
+                            "Origins of Test Topic",
+                            "Key developments and milestones",
+                            "Notable figures and contributors"
+                          ]
+                        },
+                        {
+                          "title": "Core Concepts of Test Topic",
+                          "bullet_points": [
+                            "Fundamental principles",
+                            "Common terminology",
+                            "Typical applications and examples"
+                          ]
+                        },
+                        {
+                          "title": "Benefits and Challenges",
+                          "bullet_points": [
+                            "Advantages of understanding and applying Test Topic",
+                            "Potential obstacles and how to overcome them",
+                            "Case studies or real-world scenarios"
+                          ]
+                        },
+                        {
+                          "title": "Future Trends and Developments",
+                          "bullet_points": [
+                            "Emerging trends related to Test Topic",
+                            "Predictions and expert opinions",
+                            "Opportunities for further learning and exploration"
+                          ]
+                        },
+                        {
+                          "title": "Conclusion",
+                          "bullet_points": [
+                            "Summary of key points discussed",
+                            "Final thoughts and recommendations",
+                            "Call to action or next steps for readers"
+                          ]
+                        }
+                      ]
+                    },
+                    "usage": {
+                      "promptTokens": 62,
+                      "completionTokens": 289,
+                      "totalTokens": 351
+                    },
+                    "executionTime": 5251,
+                    "timestamp": "2025-08-09T20:47:41.969Z",
+                    "webSearchEnabled": false,
+                    "webSources": 0
+                  },
+                  "executionTime": 5282,
+                  "timestamp": "2025-08-09T20:47:41.969Z"
+                },
+                "executionTime": 1754772461969,
+                "timestamp": "2025-08-09T20:47:41.969Z"
+              },
+              "timestamp": "2025-08-09T20:47:41.969Z"
+            },
+            "3": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "action": "write_content",
+              "result": {
+                "success": true,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+                "action": "write_content",
+                "result": {
+                  "success": true,
+                  "toolId": "openai_json_schema",
+                  "toolName": "OpenAI JSON Schema API",
+                  "executionId": "exec_1754772461974_07qf7dyw1",
+                  "result": {
+                    "success": true,
+                    "data": {
+                      "content": "In the realm of software development, the concept of a \"Test Topic\" serves as a foundational element for understanding testing methodologies and their applications. Testing is an integral phase in the software development lifecycle, aimed at verifying that the software meets specified requirements and identifying defects before deployment. The \"Test Topic\" encompasses various testing strategies, including unit testing, integration testing, system testing, and acceptance testing. Each strategy targets different levels of the software architecture to ensure comprehensive validation. Unit testing focuses on individual components or functions, ensuring they operate correctly in isolation. Integration testing examines the interactions between integrated units to detect interface defects. System testing evaluates the complete and integrated software product to verify compliance with requirements. Acceptance testing involves validating the software against business needs and user expectations. Modern development practices, such as Test-Driven Development (TDD) and Continuous Integration/Continuous Deployment (CI/CD), heavily rely on automated testing frameworks to enhance efficiency and reliability. Tools like JUnit, Selenium, and Jenkins facilitate automated test execution, reporting, and integration into development pipelines. Emphasizing a robust \"Test Topic\" framework not only improves software quality but also reduces time-to-market and maintenance costs. As software complexity grows, adopting comprehensive testing strategies becomes imperative for delivering reliable and secure applications."
+                    },
+                    "usage": {
+                      "promptTokens": 70,
+                      "completionTokens": 257,
+                      "totalTokens": 327
+                    },
+                    "executionTime": 3816,
+                    "timestamp": "2025-08-09T20:47:45.834Z",
+                    "webSearchEnabled": false,
+                    "webSources": 0
+                  },
+                  "executionTime": 3860,
+                  "timestamp": "2025-08-09T20:47:45.834Z"
+                },
+                "executionTime": 1754772465834,
+                "timestamp": "2025-08-09T20:47:45.834Z"
+              },
+              "timestamp": "2025-08-09T20:47:45.835Z"
+            },
+            "4": {
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "action": "review_content",
+              "result": {
+                "success": true,
+                "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+                "action": "review_content",
+                "result": {
+                  "success": true,
+                  "toolId": "openai_json_schema",
+                  "toolName": "OpenAI JSON Schema API",
+                  "executionId": "exec_1754772465840_vdvle65rn",
+                  "result": {
+                    "success": true,
+                    "data": {
+                      "score": 0,
+                      "suggestions": [
+                        "Please provide the content you want me to review."
+                      ]
+                    },
+                    "usage": {
+                      "promptTokens": 68,
+                      "completionTokens": 29,
+                      "totalTokens": 97
+                    },
+                    "executionTime": 950,
+                    "timestamp": "2025-08-09T20:47:46.839Z",
+                    "webSearchEnabled": false,
+                    "webSources": 0
+                  },
+                  "executionTime": 999,
+                  "timestamp": "2025-08-09T20:47:46.839Z"
+                },
+                "executionTime": 1754772466839,
+                "timestamp": "2025-08-09T20:47:46.839Z"
+              },
+              "timestamp": "2025-08-09T20:47:46.839Z"
+            }
+          },
+          "nodeRedFlow": {
+            "id": "content_creation_workflow",
+            "label": "Content Creation Workflow",
+            "nodes": [
+              {
+                "id": "research_node",
+                "type": "openai-function",
+                "name": "Research Topic",
+                "config": {
+                  "function": "research_topic",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "topic": {
+                        "type": "string"
+                      },
+                      "researchDepth": {
+                        "type": "string",
+                        "enum": [
+                          "basic",
+                          "comprehensive",
+                          "expert"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "outline_node",
+                "type": "openai-function",
+                "name": "Create Outline",
+                "config": {
+                  "function": "create_outline",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "researchData": {
+                        "type": "object"
+                      },
+                      "structure": {
+                        "type": "string",
+                        "enum": [
+                          "chronological",
+                          "problem_solution",
+                          "list",
+                          "story"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "writing_node",
+                "type": "openai-function",
+                "name": "Write Content",
+                "config": {
+                  "function": "write_content",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "outline": {
+                        "type": "object"
+                      },
+                      "tone": {
+                        "type": "string"
+                      },
+                      "wordCount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "review_node",
+                "type": "openai-function",
+                "name": "Review Content",
+                "config": {
+                  "function": "review_content",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "content": {
+                        "type": "string"
+                      },
+                      "criteria": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "connections": [
+              {
+                "from": "research_node",
+                "to": "outline_node"
+              },
+              {
+                "from": "outline_node",
+                "to": "writing_node"
+              },
+              {
+                "from": "writing_node",
+                "to": "review_node"
+              }
+            ]
+          }
+        },
+        "execution": {
+          "startTime": "2025-08-09T20:47:33.396Z",
+          "endTime": "2025-08-09T20:47:46.839Z",
+          "duration": 13443,
+          "agentAssignments": [
+            {
+              "step": 1,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "agentType": "research_agent"
+            },
+            {
+              "step": 2,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "agentType": "outline_agent"
+            },
+            {
+              "step": 3,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "agentType": "writing_agent"
+            },
+            {
+              "step": 4,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "agentType": "review_agent"
+            }
+          ],
+          "errors": []
+        }
+      }
     ]
   ],
   "taskQueue": [
-    "task_1754760092384_o5jt5vx9p"
+    "task_1754760092384_o5jt5vx9p",
+    "task_1754772453395_m5urz7com"
   ],
-  "completedTasks": [],
+  "completedTasks": [
+    "task_1754772453395_m5urz7com"
+  ],
   "failedTasks": [
     "task_1754760092384_o5jt5vx9p"
   ],
-  "timestamp": "2025-08-09T17:21:32.396Z"
+  "timestamp": "2025-08-09T20:47:46.839Z"
 }
