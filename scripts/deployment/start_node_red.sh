@@ -83,6 +83,16 @@ start_node_red() {
     echo "PID file: $PID_FILE"
     echo ""
 
+    # Load environment variables from project .env if present
+    REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+    if [ -f "$REPO_ROOT/.env" ]; then
+        print_status "Loading environment variables from .env"
+        set -a
+        # shellcheck disable=SC1090
+        . "$REPO_ROOT/.env"
+        set +a
+    fi
+
     # Check if Node-RED is installed
     if ! command -v node-red >/dev/null 2>&1; then
         print_error "Node-RED is not installed. Please install it first:"

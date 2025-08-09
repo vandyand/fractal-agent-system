@@ -184,35 +184,24 @@ class ToolRegistry {
         return await this.executeDirectOpenAICall(inputData, options);
       }
 
-      // For other tools, use the generic flow execution endpoint
-      const requestData = {
-        flowId: tool.nodeRedFlowId,
-        input: inputData,
-        options: {
-          timeout: options.timeout || 30000,
-          retries: options.retries || 0,
-          ...options
-        },
-        timestamp: new Date().toISOString()
-      };
-
-      // Make HTTP request to Node-RED
+      // For other tools, call an HTTP In endpoint matching the tool id if present
+      const endpoint = tool.config?.endpoint || `/api/tools/${tool.id}`;
       const response = await axios.post(
-        `${this.config.nodeRedUrl}/api/flow/execute`,
-        requestData,
+        `${this.config.nodeRedUrl}${endpoint}`,
+        inputData,
         {
           timeout: options.timeout || 30000,
-          headers: {
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Content-Type': 'application/json' }
         }
       );
 
-      if (response.data.success) {
-        return response.data.result;
-      } else {
-        throw new Error(response.data.error || 'Node-RED flow execution failed');
+      // Accept either {success:.., data:..} or raw
+      const data = response.data;
+      if (data && typeof data === 'object' && 'success' in data) {
+        if (!data.success) throw new Error(data.error || 'Tool execution failed');
+        return data.data ?? data.result ?? data;
       }
+      return data;
 
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
@@ -374,15 +363,18 @@ class ToolRegistry {
    * Validate input data against schema
    */
   validateInputData(data, schema) {
-    // TODO: Implement proper JSON schema validation with AJV
-    // For now, return valid
-    console.log('🚧 PLACEHOLDER: Schema validation not yet implemented in Tool Registry');
-    console.log('   Using validation from AgentInterface instead');
-    return { 
-      valid: true, 
-      errors: [],
-      message: "PLACEHOLDER YET TO BE IMPLEMENTED - Using AgentInterface validation"
-    };
+    try {
+      const Ajv = require('ajv');
+      const ajv = new Ajv({ allErrors: true, strict: false });
+      const validate = ajv.compile(schema || { type: 'object' });
+      const valid = validate(data);
+      return {
+        valid: !!valid,
+        errors: valid ? [] : (validate.errors || []).map(e => `${e.instancePath || e.dataPath || ''} ${e.message}`)
+      };
+    } catch (err) {
+      return { valid: false, errors: [err.message] };
+    }
   }
 
   /**

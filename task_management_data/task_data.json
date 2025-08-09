@@ -1,0 +1,355 @@
+{
+  "tasks": [
+    [
+      "task_1754760092384_o5jt5vx9p",
+      {
+        "id": "task_1754760092384_o5jt5vx9p",
+        "workflowType": "content_creation",
+        "name": "Content Creation Workflow",
+        "description": "Complete content production pipeline",
+        "status": "failed",
+        "priority": "low",
+        "inputData": {
+          "topic": "Test Topic",
+          "targetAudience": "developers",
+          "contentType": "blog_post",
+          "wordCount": 200,
+          "tone": "technical"
+        },
+        "metadata": {
+          "createdAt": "2025-08-09T17:21:32.384Z",
+          "createdBy": "test",
+          "estimatedDuration": "unknown"
+        },
+        "workflow": {
+          "template": {
+            "name": "Content Creation Workflow",
+            "description": "Complete content production pipeline",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "string",
+                  "description": "Content topic"
+                },
+                "targetAudience": {
+                  "type": "string",
+                  "description": "Target audience"
+                },
+                "contentType": {
+                  "type": "string",
+                  "enum": [
+                    "blog_post",
+                    "social_media",
+                    "email",
+                    "video_script"
+                  ]
+                },
+                "wordCount": {
+                  "type": "number",
+                  "description": "Target word count"
+                },
+                "tone": {
+                  "type": "string",
+                  "enum": [
+                    "professional",
+                    "casual",
+                    "technical",
+                    "conversational"
+                  ]
+                }
+              },
+              "required": [
+                "topic",
+                "targetAudience",
+                "contentType"
+              ]
+            },
+            "nodeRedFlow": {
+              "id": "content_creation_workflow",
+              "label": "Content Creation Workflow",
+              "nodes": [
+                {
+                  "id": "research_node",
+                  "type": "openai-function",
+                  "name": "Research Topic",
+                  "config": {
+                    "function": "research_topic",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "topic": {
+                          "type": "string"
+                        },
+                        "researchDepth": {
+                          "type": "string",
+                          "enum": [
+                            "basic",
+                            "comprehensive",
+                            "expert"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "outline_node",
+                  "type": "openai-function",
+                  "name": "Create Outline",
+                  "config": {
+                    "function": "create_outline",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "researchData": {
+                          "type": "object"
+                        },
+                        "structure": {
+                          "type": "string",
+                          "enum": [
+                            "chronological",
+                            "problem_solution",
+                            "list",
+                            "story"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "writing_node",
+                  "type": "openai-function",
+                  "name": "Write Content",
+                  "config": {
+                    "function": "write_content",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "outline": {
+                          "type": "object"
+                        },
+                        "tone": {
+                          "type": "string"
+                        },
+                        "wordCount": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "id": "review_node",
+                  "type": "openai-function",
+                  "name": "Review Content",
+                  "config": {
+                    "function": "review_content",
+                    "schema": {
+                      "type": "object",
+                      "properties": {
+                        "content": {
+                          "type": "string"
+                        },
+                        "criteria": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              ],
+              "connections": [
+                {
+                  "from": "research_node",
+                  "to": "outline_node"
+                },
+                {
+                  "from": "outline_node",
+                  "to": "writing_node"
+                },
+                {
+                  "from": "writing_node",
+                  "to": "review_node"
+                }
+              ]
+            },
+            "steps": [
+              {
+                "step": 1,
+                "agent_type": "research_agent",
+                "action": "research_topic",
+                "nodeId": "research_node"
+              },
+              {
+                "step": 2,
+                "agent_type": "outline_agent",
+                "action": "create_outline",
+                "nodeId": "outline_node"
+              },
+              {
+                "step": 3,
+                "agent_type": "writing_agent",
+                "action": "write_content",
+                "nodeId": "writing_node"
+              },
+              {
+                "step": 4,
+                "agent_type": "review_agent",
+                "action": "review_content",
+                "nodeId": "review_node"
+              }
+            ]
+          },
+          "currentStep": 1,
+          "totalSteps": 4,
+          "results": {},
+          "nodeRedFlow": {
+            "id": "content_creation_workflow",
+            "label": "Content Creation Workflow",
+            "nodes": [
+              {
+                "id": "research_node",
+                "type": "openai-function",
+                "name": "Research Topic",
+                "config": {
+                  "function": "research_topic",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "topic": {
+                        "type": "string"
+                      },
+                      "researchDepth": {
+                        "type": "string",
+                        "enum": [
+                          "basic",
+                          "comprehensive",
+                          "expert"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "outline_node",
+                "type": "openai-function",
+                "name": "Create Outline",
+                "config": {
+                  "function": "create_outline",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "researchData": {
+                        "type": "object"
+                      },
+                      "structure": {
+                        "type": "string",
+                        "enum": [
+                          "chronological",
+                          "problem_solution",
+                          "list",
+                          "story"
+                        ]
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "writing_node",
+                "type": "openai-function",
+                "name": "Write Content",
+                "config": {
+                  "function": "write_content",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "outline": {
+                        "type": "object"
+                      },
+                      "tone": {
+                        "type": "string"
+                      },
+                      "wordCount": {
+                        "type": "number"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "id": "review_node",
+                "type": "openai-function",
+                "name": "Review Content",
+                "config": {
+                  "function": "review_content",
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "content": {
+                        "type": "string"
+                      },
+                      "criteria": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "connections": [
+              {
+                "from": "research_node",
+                "to": "outline_node"
+              },
+              {
+                "from": "outline_node",
+                "to": "writing_node"
+              },
+              {
+                "from": "writing_node",
+                "to": "review_node"
+              }
+            ]
+          }
+        },
+        "execution": {
+          "startTime": "2025-08-09T17:21:32.386Z",
+          "endTime": "2025-08-09T17:21:32.396Z",
+          "duration": null,
+          "agentAssignments": [
+            {
+              "step": 1,
+              "agentId": "universe.galaxy.solar_system.planet.continent.country.city.building.email_processor_1753890527848",
+              "agentType": "research_agent"
+            }
+          ],
+          "errors": [
+            {
+              "step": 1,
+              "error": "",
+              "timestamp": "2025-08-09T17:21:32.396Z"
+            }
+          ]
+        }
+      }
+    ]
+  ],
+  "taskQueue": [
+    "task_1754760092384_o5jt5vx9p"
+  ],
+  "completedTasks": [],
+  "failedTasks": [
+    "task_1754760092384_o5jt5vx9p"
+  ],
+  "timestamp": "2025-08-09T17:21:32.396Z"
+}
