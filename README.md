@@ -109,23 +109,22 @@ npm run nodered:start
 
 ### **Basic Usage**
 ```bash
-# Start the system
-npm start
+# Start Node-RED (flow runtime)
+npm run nodered:start
 
-# Spawn an agent
-npm run spawn email_processor
+# Deploy OpenAI JSON schema flow
+npm run flows:deploy
 
-# List all agents
-npm run list
+# Verify flow works (uses OPENAI_API_KEY from .env)
+curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"model":"gpt-4.1-mini","prompt":"Return a JSON object with field x: 1","schema":{"type":"object","properties":{"x":{"type":"number"}},"required":["x"]}}' \
+  http://localhost:1880/api/openai/json-schema
 
-# Run an agent
-npm run run "agent_id_here"
+# Tool Registry test
+npm run test:tools:registry
 
-# Test communication protocol
-npm run protocol
-
-# Start autonomous business operations
-npm run business
+# Task Management (offline fallback to Tool Registry)
+ALLOW_OFFLINE=true npm run test:tasks
 ```
 
 ## 🤖 **Agent Types**
@@ -154,14 +153,11 @@ The system implements a **fractal architecture** where:
 
 ### **Setup Options**
 ```bash
-# Simple email setup (App Password)
-npm run simple:email
+# One-time Gmail OAuth setup (if using Gmail API)
+npm run email:setup
 
-# Enhanced email setup (OAuth2)
-npm run enhanced:email
-
-# Test email functionality
-npm run test:email
+# Local email responder test (already running in background per repo owner)
+npm run email:test:local
 ```
 
 ### **Features**

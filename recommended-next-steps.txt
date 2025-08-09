@@ -1,0 +1,9 @@
+  Recommended next steps (senior PM view)
+
+  • Immediate hygiene
+    • Docs-code alignment: Update README.md and guides to match actual scripts (email:setup, email:test:local, remove deploy,
+       add test:tasks). Or add missing npm scripts to match docs.
+    • Model consistency: Standardize to 'gpt-4.1-mini' | 'gpt-4.1-nano' across src/agents/fractal_agent_cli.js, tests, and
+      flows; remove gpt-4o-mini.
+    • Config unification: Add .env.example and a lightweight config loader to centralize NODE_RED_URL, OPENAI_API_KEY, Gmail
+      envs, ports.

@@ -151,7 +151,7 @@ return msg;`,
 const description = msg.payload.description;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',
@@ -193,7 +193,7 @@ return msg;`,
 const request = msg.payload.request;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',
@@ -242,7 +242,7 @@ const orderId = msg.payload.order_id;
 const inquiry = msg.payload.inquiry;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',
@@ -292,7 +292,7 @@ const reorderThreshold = msg.payload.reorder_threshold;
 const needsReorder = currentStock <= reorderThreshold;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',
@@ -334,7 +334,7 @@ return msg;`,
 const feedbackData = msg.payload.feedback_data;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',
@@ -376,7 +376,7 @@ return msg;`,
 const salesData = msg.payload.sales_data;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',
@@ -418,7 +418,7 @@ return msg;`,
 const request = msg.payload.request;
 
 msg.payload = {
-    model: 'gpt-4o-mini',
+    model: 'gpt-4.1-mini',
     response_format: {type: 'json_object'},
     messages: [{
         role: 'user',

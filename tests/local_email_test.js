@@ -177,7 +177,7 @@ Respond with a JSON object containing:
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
-          model: "gpt-4o-mini",
+          model: "gpt-4.1-mini",
           response_format: { type: "json_object" },
           messages: [
             {
@@ -303,7 +303,7 @@ Respond with a JSON object containing:
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
-          model: "gpt-4o-mini",
+          model: "gpt-4.1-mini",
           response_format: { type: "json_object" },
           messages: [
             {
